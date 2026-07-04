@@ -557,16 +557,16 @@ function calculateResults() {
   });
 
   const gapDescriptions = {
-    "Introduction to Arduino & Hardware": "สับสนประวัติของ Arduino ชนิดบอร์ดต่างๆ ขีดจำกัดทางไฟฟ้าของพิน I/O และหน้าที่การทำงานของบูตโหลดเดอร์",
-    "Arduino C Programming Basics": "สับสนโครงสร้างภาษา C ชนิดข้อมูล/การใช้ขนาดหน่วยความจำ และขอบเขตของตัวแปร (Scope)",
-    "Basic I/O Components": "สับสนการต่อสวิตช์แบบ Active Low / Active High ขา NO/NC ของรีเลย์ และวงจรไดรฟ์ทรานซิสเตอร์ป้องกันการกระชาก",
-    "Character LCD & I2C Interface": "สับสนการเชื่อมต่อแบบ I2C ตำแหน่ง cursor 0-indexed และการแชร์บัสด้วยที่อยู่ต่างกัน",
-    "LDR Light Sensors": "สับสนการวัดค่าความต้านทานและการใช้ตัวต้านทานต่อแบบแบ่งแรงดัน (Voltage Divider) เพื่อแปลงแรงดัน 0-5V ป้อนเข้า ADC",
-    "PIR Motion Sensors": "สับสนวิธีการตรวจสอบพฤติกรรมการตรวจจับการแผ่รังสีความร้อน การตั้งค่าจัมเปอร์ trigger mode L/H และ block time ของเซนเซอร์",
-    "DHT11 Temperature & Humidity Sensor": "สับสนไทม์มิ่งความถี่ในการอ่านค่าอย่างน้อย 2 วินาที โครงสร้างข้อมูล 40 บิต และการตรวจวัด checksum",
-    "LM35 & HIH4030 Analog Sensors": "สับสนการคำนวณสเกลเอาต์พุต (LM35 = 10mV/C) และอิทธิพลของการชดเชยอุณหภูมิสำหรับความชื้นสัมพันธ์ของ HIH4030",
-    "DS1302 Real-Time Clock": "สับสนพอร์ตเชื่อมต่อแบบ 3-wire หน้าที่ของบิต CH (Clock Halt) และการแก้ปัญหา time inconsistency ด้วย Burst Mode",
-    "SD Cards & Data Logging": "สับสนขา SPI (11, 12, 13) รูปแบบชื่อไฟล์แบบ 8.3 และความสำคัญในการใช้ flush() และ close() ป้องกันไฟล์เสียหาย"
+    "Sketch Structure & Control Flow": "สับสนวงจรการทำงานของ setup() และ loop(), ลำดับโครงสร้าง loop ต่างๆ, หรือการทำงานแบบเงื่อนไขและ scope ตัวแปร",
+    "Data Types & Variables": "สับสนความแตกต่างระหว่าง String class กับ C-strings, ขนาดการจองหน่วยความจำ RAM ของตัวแปรประเภทต่างๆ และการใช้คีย์เวิร์ด volatile",
+    "Digital & Analog I/O": "สับสนการตั้งค่า INPUT_PULLUP, ค่าจำกัดกระแสของพิน I/O หรือความละเอียดสเกลแรงดันไฟฟ้าที่ได้จาก ADC",
+    "Time & Timing": "สับสนการทำงานแบบ Blocking ของ delay() และการเขียนโค้ดจับเวลาด้วย millis() และ micros() เพื่อแก้ปัญหา rollover",
+    "Serial Communication": "สับสนขนาดบัฟเฟอร์ 64 ไบต์ของ UART, การแบ่งความต่างของ print กับ write หรือขีดจำกัดความเร็วของ SoftwareSerial",
+    "I2C & SPI Protocols": "สับสนการแชร์บัสแบบ multi-device, ความต้านทาน pull-up บัส I2C, หรือสายควบคุม CS/SS บนโปรโตคอล SPI",
+    "External Interrupts": "สับสนเงื่อนไข trigger แบบ RISING/FALLING/CHANGE, ข้อจำกัดในการเขียน ISR และการป้องกันปัญหา Race Condition",
+    "Standard Libraries": "สับสนไลบรารี Servo ขา 9-10 (Timer 1), ขีดจำกัดชื่อไฟล์แบบ 8.3 ของ SD Card หรือความหน่วงในการตอบสนองจอ Character LCD",
+    "MicroPython on Arduino": "สับสนการตั้งค่าโมดูล machine, ความแตกต่างของไวยากรณ์ Python Dynamic Typing และข้อจำกัดในการห้าม allocate dynamic memory ใน ISR",
+    "Arduino IoT Cloud & API": "สับสนกลไกการซิงก์ตัวแปรแบบ On Change / Periodic, หน้าที่ของ callback function และการทำงานระบบรักษาความปลอดภัยบน cryptochip"
   };
 
   if (failedTopics.length === 0) {
@@ -585,11 +585,11 @@ function calculateResults() {
   const sortedFailed = [...failedTopics].sort((a,b) => a.percent - b.percent);
   
   const revisionSuggestions = [
-    "ศึกษาข้อจำกัดกระแสดิจิทัลเอาต์พุต (Max 40mA, แนะนำ 20mA) และวงจรไดร์เวอร์ป้องกันกระแสไฟไหลย้อนกลับด้วยไดโอด",
-    "ทบทวนการต่อสวิตช์ร่วมกับความต้านทานแบบภายใน INPUT_PULLUP ที่ค่าปุ่มกดทำงานเมื่ออ่านได้สถานะเป็น LOW",
-    "หลีกเลี่ยงการใช้คำสั่ง lcd.clear() ใน loop() ที่ทำงานวนรอบอย่างรวดเร็ว เพื่อลดปัญหาระบบแสดงผลกระพริบตา",
-    "ทบทวนการคำนวณและประยุกต์ใช้วงจรแบ่งแรงดัน (Voltage Divider) ในตัวต้านทานปรับค่าตามแสง (LDR)",
-    "ฝึกฝนกระบวนการเขียนข้อมูลลง SD Card, การแยกแยะอุปกรณ์บนบัส SPI และการปิดไฟล์/flush เสมอเพื่อรักษาไฟล์ข้อมูล"
+    "หลีกเลี่ยงการใช้ String class ใน Uno/AVR ที่มี RAM น้อย เพื่อลดปัญหา RAM fragmentation และระบบแฮงก์",
+    "ทบทวนการเขียนโค้ดแบบ non-blocking timing โดยเปรียบเทียบผลต่างของ millis() เพื่อป้องกันบั๊กเวลา rollover",
+    "ศึกษาการแยกความต่างระหว่าง Serial.print() (ASCII) และ Serial.write() (Binary) เพื่อส่งค่าข้อมูลได้ถูกต้อง",
+    "ทบทวนการประกาศ volatile สำหรับตัวแปรแชร์ระหว่าง ISR และ main loop เพื่อป้องกันคอมไพเลอร์ข้ามการอ่านค่าในแรม",
+    "หลีกเลี่ยงการ allocate memory หรือจัดรูปแบบ String ภายใน ISR ของ MicroPython เพื่อเลี่ยงความเสียหายของ runtime"
   ];
 
   if (sortedFailed.length > 0) {

@@ -4,1526 +4,1161 @@ import os
 
 # Define topic names
 topic_names = {
-    1: "Introduction to Arduino & Hardware",
-    2: "Arduino C Programming Basics",
-    3: "Basic I/O Components",
-    4: "Character LCD & I2C Interface",
-    5: "LDR Light Sensors",
-    6: "PIR Motion Sensors",
-    7: "DHT11 Temperature & Humidity Sensor",
-    8: "LM35 & HIH4030 Analog Sensors",
-    9: "DS1302 Real-Time Clock",
-    10: "SD Cards & Data Logging"
+    1: "Sketch Structure & Control Flow",
+    2: "Data Types & Variables",
+    3: "Digital & Analog I/O",
+    4: "Time & Timing",
+    5: "Serial Communication",
+    6: "I2C & SPI Protocols",
+    7: "External Interrupts",
+    8: "Standard Libraries",
+    9: "MicroPython on Arduino",
+    10: "Arduino IoT Cloud & API"
 }
 
-mcqs = []
-tfs = []
-scenarios = []
-shorts = []
+# 150 MCQs
+# Format: (topic_id, "Difficulty", "Objective", "Question", ["OptA", "OptB", "OptC", "OptD"], "CorrectOpt", "Explanation")
+mcqs_raw = [
+    # Topic 1: Sketch Structure & Control Flow (15 Questions: 5 Easy, 7 Medium, 3 Hard)
+    (1, "Easy", "Sketch Entry Points", "Which function is executed once at the start of an Arduino sketch?", 
+     ["loop()", "setup()", "main()", "init()"], "B", "setup() runs once when the board boots or resets to configure pin modes and initialize settings."),
+    (1, "Easy", "Continuous Execution", "Which function runs repeatedly and contains the main loop of an Arduino sketch?", 
+     ["setup()", "run()", "loop()", "execute()"], "C", "loop() is executed repeatedly as long as the board has power, containing the active program code."),
+    (1, "Easy", "C++ Statement Terminator", "What symbol is required at the end of every programming statement in Arduino C++?", 
+     [": (colon)", "; (semicolon)", ". (period)", ", (comma)"], "B", "A semicolon is used as a statement terminator in C++ syntax."),
+    (1, "Easy", "Comparison Operators", "Which operator is used to check if two variables are equal in Arduino C++?", 
+     ["=", "==", "===", "!="], "B", "The double equals (==) is the comparison operator for equality, whereas a single equals is the assignment operator."),
+    (1, "Easy", "Code Comments", "Which syntax is correct for a single-line comment in Arduino C++?", 
+     ["# comment", "/* comment", "// comment", "-- comment"], "C", "Double slashes (//) denote the start of a single-line comment in C++."),
+    (1, "Medium", "Variable Scopes", "What is the scope of a variable declared inside the setup() function?", 
+     ["Global scope", "Local to setup() only", "Class scope", "Namespace scope"], "B", "Variables declared inside a function are local to that function and cannot be accessed outside of it."),
+    (1, "Medium", "Loop Structures", "Which loop structure is guaranteed to execute its code block at least once?", 
+     ["for loop", "while loop", "do-while loop", "infinite loop"], "C", "A do-while loop evaluates its condition after executing the body, ensuring at least one execution."),
+    (1, "Medium", "Switch-Case fall-through", "In a switch-case statement, what happens if the 'break' statement is omitted at the end of a case block?", 
+     ["The code throws a compile error", "Execution terminates immediately", "Execution falls through to the next case", "The loop resets"], "C", "Omitting break causes execution to fall through and execute subsequent cases until a break is encountered."),
+    (1, "Medium", "Function return types", "If a function does not return any value, what return type must be declared?", 
+     ["int", "void", "null", "empty"], "B", "The 'void' keyword is used to specify that a function does not return a value."),
+    (1, "Medium", "Conditional execution", "What is the difference between the logical AND operator (&&) and logical OR operator (||)?", 
+     ["&& requires both conditions true, || requires only one", "&& requires one condition true, || requires both", "&& checks floats, || checks integers", "&& terminates loop, || skips iteration"], "A", "Logical AND requires all conditions to be true, while logical OR evaluates to true if at least one condition is true."),
+    (1, "Medium", "Sketch Entry constraints", "What happens if a sketch contains no loop() function defined?", 
+     ["It compiles and halts immediately", "It compiles and loops setup()", "It fails to compile due to missing reference", "It works but inputs are disabled"], "C", "The compiler expects both setup() and loop() to be defined; missing either causes a linker/compiler error."),
+    (1, "Medium", "Preprocessor directives", "Which preprocessor directive is used to define a macro constant in Arduino?", 
+     ["#const", "#define", "#macro", "#include"], "B", "#define is a preprocessor directive that replaces occurrences of a macro name with specified text before compilation."),
+    (1, "Hard", "Preprocessor conditional compilation", "How can you prevent a code section from compiling for a specific board type using preprocessors?", 
+     ["Using if/else statements", "Using #ifdef and #endif directives", "Using virtual functions", "Using namespace scopes"], "B", "#ifdef and #endif allow conditional compilation based on whether specific macros (like board models) are defined."),
+    (1, "Hard", "Memory exhaustion risks", "Why is deep recursion generally avoided in Arduino programming?", 
+     ["It occupies too much flash memory", "It causes stack overflow in limited SRAM", "It blocks interrupts", "It causes compiler timeout"], "B", "Each recursive call consumes stack space in SRAM. Given limited RAM (e.g., 2KB on Uno), deep recursion can easily crash the board."),
+    (1, "Hard", "Short-Circuit evaluation", "What is the behavior of short-circuit evaluation in a logical AND operation (expr1 && expr2)?", 
+     ["Both expr1 and expr2 are always evaluated", "expr2 is evaluated first", "If expr1 is false, expr2 is not evaluated", "If expr1 is true, expr2 is not evaluated"], "C", "In logical AND, if the first expression is false, the overall outcome must be false, so the compiler skips evaluating the second expression."),
 
-# MCQs list (150 questions)
-# Topic 1 to 10. 15 questions per topic.
-# Fields: id, topic, learning_objective, difficulty, question, options, correct_answer, explanation
+    # Topic 2: Data Types & Variables (15 Questions: 5 Easy, 7 Medium, 3 Hard)
+    (2, "Easy", "Basic Data Types", "Which data type is best suited to store a true/false value?", 
+     ["int", "float", "char", "boolean"], "D", "A boolean data type stores either 'true' or 'false' (using 1 byte of memory in Arduino)."),
+    (2, "Easy", "Floating-Point types", "Which data type should be used to store decimal values like 3.14159?", 
+     ["int", "float", "long", "byte"], "B", "The 'float' type is used to store floating-point (decimal) numbers."),
+    (2, "Easy", "Integer Memory Usage", "How many bytes of memory does an 'int' type consume on an 8-bit AVR board like Arduino Uno?", 
+     ["1 byte", "2 bytes", "4 bytes", "8 bytes"], "B", "On 8-bit AVR boards, an int occupies 16 bits (2 bytes), whereas on 32-bit boards (like Due or Nano 33) it occupies 4 bytes."),
+    (2, "Easy", "Array Indexing", "What is the index of the first element in an array?", 
+     ["-1", "0", "1", "Depends on array size"], "B", "Arrays in C++ are 0-indexed; the first element is accessed using index 0."),
+    (2, "Easy", "Character Types", "What is the memory size and range of a signed 'char' data type?", 
+     ["1 byte (-128 to 127)", "2 bytes (0 to 65535)", "1 byte (0 to 255)", "4 bytes (floating-point)"], "A", "A char occupies 1 byte (8 bits) of memory, storing signed values from -128 to 127."),
+    (2, "Medium", "Variable Qualifiers", "What is the primary function of the 'const' variable qualifier?", 
+     ["It puts the variable in dynamic heap", "It prevents the variable from being modified after initialization", "It forces the variable to be 16-bit", "It enables interrupt access"], "B", "The const keyword stands for constant and prevents code from modifying the variable's value after it is initialized."),
+    (2, "Medium", "Interrupt Variables", "Why should variables modified inside an Interrupt Service Routine (ISR) be declared with 'volatile'?", 
+     ["To allocate them in EEPROM", "To force the compiler to load the variable from SRAM instead of caching it in a CPU register", "To increase their precision", "To reduce RAM usage"], "B", "The volatile keyword tells the compiler that the variable's value may change at any time (via an ISR) outside normal program flow, forcing it to read fresh values from RAM."),
+    (2, "Medium", "Integer Overflow", "What happens when an unsigned 8-bit integer variable (byte) holding 255 is incremented by 1?", 
+     ["It throws a runtime exception", "It remains 255", "It rolls over to 0", "It expands to a 16-bit int"], "C", "An 8-bit unsigned byte ranges from 0 to 255. Incrementing past 255 causes an overflow, rolling the value back to 0."),
+    (2, "Medium", "String class vs C-strings", "What is the main drawback of using the 'String' object class compared to null-terminated char arrays (C-strings)?", 
+     ["It does not support concatenation", "It uses only 1 byte of memory", "It causes heap fragmentation in limited SRAM", "It compiles slower"], "C", "The String class dynamically allocates memory on the heap. Frequent modifications cause heap fragmentation, potentially leading to memory allocation failures in devices with small RAM."),
+    (2, "Medium", "Variables persistence", "How does the 'static' keyword modify the behavior of a local variable inside a function?", 
+     ["It deletes the variable when the function returns", "It keeps the variable in memory and retains its value between function calls", "It makes the variable globally accessible", "It locks the variable from interrupts"], "B", "A static local variable is initialized only once and retains its value between successive calls to the function containing it."),
+    (2, "Medium", "Integer Data Limits", "What is the maximum value that can be stored in an unsigned 16-bit integer (unsigned int)?", 
+     ["32,767", "65,535", "2,147,483,647", "4,294,967,295"], "B", "An unsigned 16-bit integer can represent values from 0 to (2^16 - 1), which is 65,535."),
+    (2, "Medium", "Array Bounds", "What happens if your code writes to an array index that is out of bounds?", 
+     ["The compiler generates a warning", "It overwrites adjacent memory variables, causing unpredictable crashes", "The execution halts immediately with a safe trap", "The array auto-expands"], "B", "C++ does not perform runtime array boundary checking. Writing out-of-bounds writes directly to adjacent memory, leading to variable corruption and system instability."),
+    (2, "Hard", "Float precision limitations", "Why can float variable comparisons (e.g., floatVal == 1.5) be unreliable in C++?", 
+     ["Floats cannot hold numbers larger than 100", "Floating-point numbers are stored with binary approximations and can contain small rounding errors", "Floats are automatically cast to integers before comparison", "Floats cannot be used with comparison operators"], "B", "Floats use binary representation which cannot exactly represent many decimal fractions. Slight rounding issues make exact equality comparison unsafe; comparing using a delta threshold (epsilon) is preferred."),
+    (2, "Hard", "Sizeof Operator behavior", "What does the 'sizeof()' operator return when applied to an array of 10 integers on an Arduino Uno?", 
+     ["10", "20", "40", "2"], "B", "sizeof() returns the size of the object in bytes. Since an integer is 2 bytes on the Uno, an array of 10 integers occupies 20 bytes."),
+    (2, "Hard", "Variables Alignment", "What is the benefit of using variable structs with byte-alignment considerations in Arduino?", 
+     ["It speeds up compiling", "It optimizes RAM usage by packing variables and avoiding compiler padding bytes", "It makes variables constants", "It prevents division by zero"], "B", "Structuring data carefully reduces padding bytes on platforms that enforce alignment rules, conserving limited RAM."),
 
-mcqs_data = [
-    # TOPIC 1
-    (1, "Origin of Arduino", "Easy", 
-     "Where was the Arduino project founded in 2005?",
-     ["MIT, USA", "Interaction Design Institute Ivrea, Italy", "Munich, Germany", "Tokyo, Japan"],
-     "B", "Arduino was created at the Interaction Design Institute Ivrea in Italy."),
-    (1, "Microcontroller model on Uno", "Easy",
-     "Which microcontroller chip is used on the Arduino UNO R3?",
-     ["ATmega2560", "ATmega32U4", "ATmega328P", "ATtiny85"],
-     "C", "The Arduino UNO R3 uses the ATmega328P microcontroller."),
-    (1, "Standard voltage of Arduino Uno", "Easy",
-     "What is the standard operating voltage of the Arduino UNO board components?",
-     ["3.3V", "5.0V", "9.0V", "12.0V"],
-     "B", "The ATmega328P microcontroller on the UNO operates at 5V."),
-    (1, "Analog pin count on Arduino Uno", "Easy",
-     "How many analog input pins are available on the Arduino UNO R3?",
-     ["4", "6", "8", "16"],
-     "B", "The Arduino UNO has 6 analog inputs (A0 to A5)."),
-    (1, "Clock frequency of Arduino Uno", "Medium",
-     "What is the clock frequency of the crystal oscillator on the Arduino UNO R3?",
-     ["8 MHz", "16 MHz", "20 MHz", "84 MHz"],
-     "B", "The Arduino UNO uses a 16 MHz crystal oscillator."),
-    (1, "SRAM on Arduino Uno", "Medium",
-     "How much Static RAM (SRAM) is available on the ATmega328P on Arduino UNO?",
-     ["1 KB", "2 KB", "4 KB", "32 KB"],
-     "B", "The ATmega328P has 2 KB of SRAM for storing variables during execution."),
-    (1, "Flash Memory size on ATmega328P", "Medium",
-     "How much Flash memory is available on the ATmega328P microcontroller?",
-     ["16 KB", "32 KB", "64 KB", "128 KB"],
-     "B", "The ATmega328P features 32 KB of flash memory (with 0.5 KB used by bootloader)."),
-    (1, "Arduino Mega microcontroller model", "Medium",
-     "Which microcontroller chip is used on the Arduino Mega 2560 R3?",
-     ["ATmega328P", "ATmega32U4", "ATmega2560", "SAM3X8E"],
-     "C", "The Arduino Mega 2560 is based on the ATmega2560 microcontroller."),
-    (1, "Arduino Due operating voltage", "Medium",
-     "What is the operating voltage of the Arduino Due board?",
-     ["1.8V", "3.3V", "5.0V", "9.0V"],
-     "B", "The Arduino Due is powered by an ARM Cortex-M3 processor which operates at 3.3V."),
-    (1, "Leonardo built-in USB capability", "Medium",
-     "Why can the Arduino Leonardo connect directly as a USB keyboard or mouse?",
-     ["It has a separate Atmega16U2 chip", "It uses the ATmega32U4 which has built-in USB transceiver", "It runs a specialized software library in SRAM", "It has a hardware USB host shield built-in"],
-     "B", "The ATmega32U4 on the Leonardo features native USB communication support."),
-    (1, "Recommended input voltage range", "Medium",
-     "What is the recommended input voltage (VIN) range for the Arduino UNO?",
-     ["5V - 6V", "7V - 12V", "12V - 20V", "15V - 24V"],
-     "B", "The recommended input voltage range is 7V to 12V to ensure stable power regulation."),
-    (1, "Absolute maximum current per I/O pin", "Medium",
-     "What is the absolute maximum continuous DC current allowed per digital I/O pin?",
-     ["10 mA", "20 mA", "40 mA", "100 mA"],
-     "C", "Exceeding 40mA per I/O pin on the ATmega328P will cause permanent damage to the silicon port drivers."),
-    (1, "Total combined I/O current limit", "Medium",
-     "What is the combined maximum current limit that all I/O pins can source or sink together?",
-     ["100 mA", "200 mA", "400 mA", "500 mA"],
-     "B", "The maximum continuous current limit for the VCC or GND pin of the ATmega328P package is 200mA."),
-    (1, "Arduino Due processor model", "Hard",
-     "Which processor core is used on the Arduino Due?",
-     ["8-bit AVR", "32-bit ARM Cortex-M3", "16-bit PIC", "32-bit ESP32"],
-     "B", "The Arduino Due is based on the SAM3X8E 32-bit ARM Cortex-M3 microcontroller."),
-    (1, "Bootloader function in Arduino", "Hard",
-     "What is the primary role of the bootloader pre-programmed on the ATmega328P?",
-     ["Compiling C code into hex files", "Allowing sketches to be uploaded via Serial interface without programmer hardware", "Protecting the microcontroller from overvoltage", "Caching variables to speed up code execution"],
-     "B", "The bootloader is a small program that handles programming over the serial interface during startup."),
+    # Topic 3: Digital & Analog I/O (15 Questions: 5 Easy, 7 Medium, 3 Hard)
+    (3, "Easy", "Pin Configuration", "Which function is used to configure a pin as an input or output?", 
+     ["digitalWrite()", "pinMode()", "digitalRead()", "setupPin()"], "B", "pinMode() sets the electrical state of a specified pin to INPUT, OUTPUT, or INPUT_PULLUP."),
+    (3, "Easy", "Digital Outputs", "Which function is used to output a HIGH or LOW voltage level on a digital pin?", 
+     ["pinMode()", "digitalRead()", "digitalWrite()", "analogWrite()"], "C", "digitalWrite() sets a digital output pin to either HIGH (5V/3.3V) or LOW (0V)."),
+    (3, "Easy", "Digital Inputs", "What function is used to read the high/low state of a digital input pin?", 
+     ["digitalWrite()", "digitalRead()", "analogRead()", "pinRead()"], "B", "digitalRead() reads the physical voltage status of a configured digital input pin (HIGH or LOW)."),
+    (3, "Easy", "Analog Inputs", "What is the default bit resolution of the analog-to-digital converter (ADC) on an Arduino Uno?", 
+     ["8-bit", "10-bit", "12-bit", "16-bit"], "B", "The default resolution of the AVR ADC on Uno is 10-bit (returning values from 0 to 1023)."),
+    (3, "Easy", "PWM Outputs", "Which function is used to generate a Pulse Width Modulation (PWM) signal on supported pins?", 
+     ["digitalWrite()", "analogRead()", "analogWrite()", "pwmWrite()"], "C", "analogWrite() outputs a PWM signal with a duty cycle specified from 0 (always off) to 255 (always on)."),
+    (3, "Medium", "INPUT_PULLUP state", "How does configuring a pin as INPUT_PULLUP affect its electrical state?", 
+     ["It connects the pin directly to ground", "It activates an internal pull-up resistor, keeping the pin HIGH by default", "It increases current output capacity to 40mA", "It converts the pin to an analog pin"], "B", "INPUT_PULLUP activates the internal pull-up resistor (typically 20k-50k ohms), holding the pin input HIGH when it is disconnected/floating."),
+    (3, "Medium", "Analog Voltage calculation", "If analogRead() on a 5V Arduino board returns a value of 512, what is the measured input voltage?", 
+     ["1.25V", "2.50V", "3.75V", "5.00V"], "B", "An ADC value of 512 corresponds to half of the maximum 10-bit scale (1023), which is 2.5V (5V * 512 / 1023)."),
+    (3, "Medium", "PWM Duty Cycle calculation", "What duty cycle is represented by a call to analogWrite(pin, 64)?", 
+     ["10%", "25%", "50%", "75%"], "B", "Duty cycle is determined by value/255. 64/255 is approximately 25.1% duty cycle."),
+    (3, "Medium", "High Impedance State", "Why is a pin set to INPUT referred to as being in a 'high impedance' state?", 
+     ["It sources high current to devices", "It consumes very little current from the circuit it is measuring", "It switches voltage levels rapidly", "It acts as a low-resistance path to ground"], "B", "An input pin has high input impedance, meaning it takes negligible current (typically < 1 microampere) from the circuit, reducing loading effects."),
+    (3, "Medium", "Floating pin behavior", "What is the risk of reading a digital input pin that has nothing connected to it (floating pin)?", 
+     ["It will always return LOW", "It will return random HIGH/LOW values due to electrical noise", "It will damage the microcontroller chip", "The program will crash"], "B", "A floating input pin has no defined voltage reference and will fluctuate randomly between HIGH and LOW due to electromagnetic noise."),
+    (3, "Medium", "PWM frequency limitations", "What is the typical default frequency of PWM signals on most Arduino Uno pins?", 
+     ["50 Hz", "490 Hz", "10 kHz", "1 MHz"], "B", "Most pins (like 3, 9, 10, 11) run PWM at approximately 490 Hz, while pins 5 and 6 run at about 980 Hz."),
+    (3, "Medium", "analogRead speed", "How long does a standard analogRead() call take to complete on an 8-bit AVR board like the Uno?", 
+     ["1 microsecond", "100 microseconds", "1 millisecond", "10 milliseconds"], "B", "A standard analogRead() takes about 100 microseconds, restricted by the hardware conversion speed of the successive-approximation ADC."),
+    (3, "Hard", "ADC Reference modification", "What function is used to change the reference voltage of the ADC to an external source, and what is a critical risk associated with it?", 
+     ["analogReference(); risk of damaging the microcontroller if reference voltage exceeds VCC", "setADC(); risk of disabling interrupts", "adcRef(); risk of losing PWM control", "analogWriteResolution(); risk of float overflow"], "A", "analogReference() changes the reference voltage. Applying voltage to the AREF pin before calling analogReference(EXTERNAL) can burn out the internal ADC circuitry."),
+    (3, "Hard", "High-Resolution ADC configurations", "Which command is used on 32-bit SAMD boards (like Arduino Zero/Nano 33 IoT) to change analog input resolution?", 
+     ["analogResolution()", "analogReadResolution()", "setAdcBits()", "adcConfigure()"], "B", "analogReadResolution() allows configuring 10-bit, 12-bit, or higher ADC resolutions on boards with supported high-res ADC hardware."),
+    (3, "Hard", "Port Manipulation usage", "What is the advantage of using Port Manipulation (direct register access like PORTD) over digitalWrite()?", 
+     ["It uses less flash memory", "It allows setting multiple pins simultaneously and executes significantly faster", "It converts digital pins to analog output", "It handles switch bouncing automatically"], "B", "Port manipulation bypasses the safety wrappers of digitalWrite(), executing in a single clock cycle and allowing synchronous state changes across multiple pins of a port."),
 
-    # TOPIC 2
-    (2, "C syntax structure", "Easy",
-     "Which function in an Arduino sketch runs once at the very beginning of execution?",
-     ["loop()", "setup()", "init()", "main()"],
-     "B", "The setup() function is called once when the sketch starts and is used for initialization."),
-    (2, "C syntax loop function", "Easy",
-     "Which function runs continuously in an Arduino sketch after initialization?",
-     ["setup()", "run()", "loop()", "execute()"],
-     "C", "The loop() function repeats infinitely and contains the main logic of the application."),
-    (2, "Semicolon role", "Easy",
-     "What character is used to terminate statements in the C programming language?",
-     ["Colon (:)", "Semicolon (;)", "Period (.)", "Comma (,)"],
-     "B", "A semicolon (;) is used to mark the end of a statement in C."),
-    (2, "Line comment syntax", "Easy",
-     "Which symbol is used to create a single-line comment in C?",
-     ["/*", "//", "#", ";"],
-     "B", "// is used for single-line comments in C/C++."),
-    (2, "Block comment syntax", "Easy",
-     "Which syntax is used for multi-line block comments in C?",
-     ["//...//", "/*...*/", "#...#", "<!--...-->"],
-     "B", "/* starts a block comment and */ terminates it."),
-    (2, "Variable naming rules", "Medium",
-     "Which of the following is a valid variable name in C?",
-     ["2sensorVal", "sensor_Val", "sensor-Val", "sensor Val"],
-     "B", "Variables cannot start with numbers, contain spaces, or contain hyphens. Underscores are allowed."),
-    (2, "Data types memory size", "Medium",
-     "How many bytes of memory does an 'int' data type occupy on an Arduino UNO?",
-     ["1 byte", "2 bytes", "4 bytes", "8 bytes"],
-     "B", "On 8-bit AVR boards like the Arduino UNO, an integer (int) occupies 2 bytes (16 bits) of SRAM."),
-    (2, "Char data type storage", "Medium",
-     "Which data type is used to store a single character in C, and how many bytes does it use?",
-     ["string (2 bytes)", "char (1 byte)", "float (4 bytes)", "boolean (1 byte)"],
-     "B", "The char data type is used to store single characters and occupies 1 byte (8 bits) of memory."),
-    (2, "Boolean constant mapping", "Medium",
-     "What are the predefined boolean constants used in Arduino C?",
-     ["HIGH and LOW", "INPUT and OUTPUT", "true and false", "1 and -1"],
-     "C", "In C/C++, true and false are boolean constants (true maps to 1, false to 0)."),
-    (2, "Arithmetic modulo operator", "Medium",
-     "Which operator is used to calculate the remainder of an integer division in C?",
-     ["Slash (/)", "Percent (%)", "Asterisk (*)", "Ampersand (&)"],
-     "B", "The modulo operator (%) yields the remainder of the division of one integer by another."),
-    (2, "Comparison operator syntax", "Medium",
-     "Which comparison operator is used to check if two values are equal in C?",
-     ["=", "==", "===", "!="],
-     "B", "The equality operator in C is ==. The single = is the assignment operator."),
-    (2, "Compound assignment operator", "Hard",
-     "What does the expression 'x += 5' evaluate to?",
-     ["x is multiplied by 5", "x is assigned the value 5", "x is incremented by 5", "x is compared with 5"],
-     "C", "x += 5 is shorthand for x = x + 5, which adds 5 to the current value of x and assigns the result back to x."),
-    (2, "Logical AND operator", "Easy",
-     "Which operator represents logical AND in C?",
-     ["&", "&&", "|", "||"],
-     "B", "&& is the logical AND operator. A single & is the bitwise AND operator."),
-    (2, "Logical OR operator", "Easy",
-     "Which operator represents logical OR in C?",
-     ["|", "||", "!", "&&"],
-     "B", "|| is the logical OR operator. A single | is the bitwise OR operator."),
-    (2, "Variable scope rules", "Hard",
-     "If a variable is declared inside the loop() function, where can it be accessed?",
-     ["Only inside the loop() function", "Anywhere in the entire sketch", "Only inside setup()", "In both setup() and loop()"],
-     "A", "Variables declared inside a function have local scope and are only visible/accessible within that function."),
+    # Topic 4: Time & Timing (15 Questions: 5 Easy, 7 Medium, 3 Hard)
+    (4, "Easy", "Millisecond Delay", "Which function suspends program execution for a specified number of milliseconds?", 
+     ["wait()", "delay()", "sleep()", "pause()"], "B", "delay() pauses the sketch for the amount of time (in milliseconds) specified as a parameter."),
+    (4, "Easy", "Microsecond Delay", "Which function is used to pause the program for a very short duration in microseconds?", 
+     ["delay()", "delayMicroseconds()", "usDelay()", "pauseMicro()"], "B", "delayMicroseconds() provides fine-grained pauses in microseconds for timing-critical tasks."),
+    (4, "Easy", "Running Time milliseconds", "Which function returns the number of milliseconds elapsed since the Arduino board started running the current sketch?", 
+     ["millis()", "time()", "getTicks()", "clock()"], "C", "millis() returns an unsigned long representing the milliseconds elapsed since boot."),
+    (4, "Easy", "Running Time microseconds", "Which function returns the elapsed time in microseconds since the board booted?", 
+     ["micros()", "millis()", "timeMicro()", "getMicroseconds()"], "A", "micros() returns the number of microseconds elapsed since the program started."),
+    (4, "Easy", "Unsigned Long usage", "What data type is returned by the millis() and micros() functions?", 
+     ["int", "long", "unsigned long", "unsigned int"], "C", "Both functions return an unsigned long, which prevents early overflow of the time counter."),
+    (4, "Medium", "millis Rollover period", "After approximately how many days does the millis() counter overflow and roll back to zero?", 
+     ["50 days", "25 days", "70 days", "9 hours"], "A", "The 32-bit unsigned long used by millis() rolls over back to 0 after approximately 49.7 days (2^32 - 1 milliseconds)."),
+    (4, "Medium", "Safe Rollover subtraction", "Why does the subtraction syntax 'currentTime - previousTime >= interval' correctly handle timing even during a millis() overflow rollover?", 
+     ["Because floats prevent rounding errors", "Because modular arithmetic in unsigned integers automatically handles overflows correctly", "Because the bootloader auto-adjusts the registers", "Because loop() resets during rollover"], "B", "Due to unsigned integer subtraction, the difference rolls over properly, giving the correct elapsed time even if the timer wrapped back to zero."),
+    (4, "Medium", "Blocking vs Non-blocking", "What is the primary disadvantage of using delay() for timing in complex sketches?", 
+     ["It consumes extra battery power", "It is blocking, preventing other code (like reading sensors or buttons) from executing during the delay", "It disables interrupts", "It causes float drift"], "B", "delay() is blocking; it forces the CPU to run idle loops, making the device unresponsive to external inputs or events during that window."),
+    (4, "Medium", "micros precision limits", "What is the resolution/step size of the micros() function on standard 16 MHz AVR boards?", 
+     ["1 microsecond", "4 microseconds", "8 microseconds", "16 microseconds"], "B", "On 16 MHz Arduino boards, the timer register scales such that micros() has a resolution of 4 microseconds (always returning multiples of 4)."),
+    (4, "Medium", "micros Rollover period", "After approximately how long does the micros() counter overflow and roll back to zero?", 
+     ["70 minutes", "70 seconds", "49 days", "9 hours"], "A", "Being a 32-bit value storing microseconds, micros() overflows and rolls over after approximately 71.5 minutes (2^32 microseconds)."),
+    (4, "Medium", "delayMicroseconds limits", "What is the maximum duration that delayMicroseconds() can reliably produce accurate delays?", 
+     ["16383 microseconds", "32767 microseconds", "65535 microseconds", "1000 microseconds"], "A", "Currently, the largest value that will produce an accurate delay is 16383. For longer delays, delay() should be used."),
+    (4, "Medium", "Non-blocking delay pattern", "Which structure is typically used to execute an action every 1 second without using blocking delays?", 
+     ["An if condition checking 'millis() - previousMillis >= 1000'", "A nested while loop", "An external hardware interrupt on pin 2", "A watchdog timer reset"], "A", "Checking the difference between current millis() and a stored timestamp allows non-blocking periodic execution."),
+    (4, "Hard", "ISR and delay constraint", "Why does calling delay() inside an Interrupt Service Routine (ISR) cause the program to hang?", 
+     ["It consumes too much flash memory", "delay() relies on interrupts (specifically Timer 0 overflows) to increment the millis counter, which are disabled inside an ISR", "ISRs do not support parameters", "It causes a stack overflow"], "B", "Inside an ISR, other interrupts are disabled by default. Since delay() checks the incrementing millis counter, which depends on the Timer 0 overflow interrupt, the counter never advances and the program halts indefinitely."),
+    (4, "Hard", "Timer Registers conflicts", "Which internal AVR timer is used by the Arduino core to drive the millis() and delay() functions?", 
+     ["Timer 0", "Timer 1", "Timer 2", "Timer 3"], "A", "Timer 0 is configured by the Arduino core libraries for system timekeeping. Using PWM or changing configurations on pins 5 and 6 (which use Timer 0) can alter timer speeds."),
+    (4, "Hard", "Prescaler modifications", "How does changing the prescaler of Timer 0 to alter PWM frequency impact system functions?", 
+     ["It shifts ADC accuracy", "It breaks the timing of millis() and delay(), causing time to pass faster or slower", "It disables the hardware Serial interface", "It makes digital inputs float"], "B", "Since millis() and delay() are calibrated to the default Timer 0 prescaler (64), altering it changes the speed at which timekeeping counters increment."),
 
-    # TOPIC 3
-    (3, "Digital I/O pin modes", "Easy",
-     "Which function is used to configure a digital pin as an INPUT or OUTPUT?",
-     ["digitalWrite()", "pinMode()", "digitalRead()", "analogWrite()"],
-     "B", "pinMode() configures the specified pin to behave either as an input or an output."),
-    (3, "Digital output control", "Easy",
-     "Which function is used to write a HIGH or LOW value to a digital output pin?",
-     ["digitalRead()", "pinMode()", "digitalWrite()", "analogWrite()"],
-     "C", "digitalWrite() is used to set the output voltage of a digital pin to 5V (HIGH) or 0V (LOW)."),
-    (3, "Digital input reading", "Easy",
-     "Which function is used to read the state of a digital pin?",
-     ["digitalRead()", "digitalWrite()", "pinMode()", "analogRead()"],
-     "A", "digitalRead() reads the value from a specified digital pin, either HIGH or LOW."),
-    (3, "Push button wiring", "Easy",
-     "When a push button is pressed in an active-low configuration with a pull-up resistor, what voltage level is read by the input pin?",
-     ["5V (HIGH)", "0V (LOW)", "Floating state", "2.5V"],
-     "B", "In an active-low pull-up configuration, the pin is pulled to HIGH (5V) by default, and pressing the button connects the pin to GND, pulling it to LOW (0V)."),
-    (3, "Buzzer connection pin requirement", "Medium",
-     "Which pin should you connect a buzzer to if you want to use the tone() function?",
-     ["Only analog inputs", "Any digital pin", "Only hardware PWM pins", "Only pin 13"],
-     "B", "The tone() function can generate a square wave of specified frequency on any digital pin."),
-    (3, "Buzzer tone function arguments", "Easy",
-     "What are the three parameters passed to the tone() function: tone(pin, frequency, duration)?",
-     ["Pin number, analog value, delay time", "Pin number, frequency in Hz, duration in milliseconds", "Pin number, volume, pulse width", "Pin number, duty cycle, period"],
-     "B", "The parameters are: pin number, frequency of the tone in Hertz, and duration in milliseconds (optional)."),
-    (3, "Electromagnetic relay function", "Medium",
-     "What is the primary purpose of a relay in an Arduino project?",
-     ["To convert AC voltage to DC voltage", "To amplify low-voltage signals into high-frequency sounds", "To control high-voltage/high-current circuits using a low-voltage control signal", "To read analog voltages from a light sensor"],
-     "C", "A relay is an electrically operated switch that allows a low-voltage Arduino output (5V) to isolate and control high-power circuits (e.g., 220V AC appliances)."),
-    (3, "Relay coil flyback diode", "Medium",
-     "Why is a flyback diode connected across a relay's control coil?",
-     ["To increase the speed of the relay closing", "To protect the Arduino from high-voltage spikes caused by inductive kickback when the coil is de-energized", "To restrict current to flow only to the relay", "To step down the voltage from 12V to 5V"],
-     "B", "Inductors (like relay coils) store energy in a magnetic field. When the current is switched off, the magnetic field collapses, generating a high-voltage spike. The flyback diode provides a path for this current to dissipate safely."),
-    (3, "Relay pin contacts NO and NC", "Medium",
-     "What do the abbreviations NO and NC stand for on a relay terminal?",
-     ["New Output / Net Current", "Normally Open / Normally Closed", "Negative Output / Neutral Common", "Node Open / Node Closed"],
-     "B", "NO stands for Normally Open (contact is open when coil is off), and NC stands for Normally Closed (contact is closed when coil is off)."),
-    (3, "Active high push button configuration", "Medium",
-     "In an active-high push button configuration using a pull-down resistor, what is the default state of the pin when the button is NOT pressed?",
-     ["HIGH", "LOW", "Floating", "5V"],
-     "B", "A pull-down resistor pulls the input pin to GND (LOW) when the button is open. Pressing the button connects it to 5V, pulling it HIGH."),
-    (3, "Input pullup internal resistor", "Medium",
-     "What happens when you configure a pin using 'pinMode(pin, INPUT_PULLUP)'?",
-     ["The pin is configured as output with high resistance", "The internal pull-up resistor of the ATmega328P is enabled", "An external resistor must be soldered to the pin", "The pin is locked to prevent writing"],
-     "B", "INPUT_PULLUP configures the pin as input and enables the internal 20K-50K ohm pull-up resistor, simplifying button wiring by eliminating external resistors."),
-    (3, "Relay switching current limit", "Medium",
-     "Why can't an Arduino digital pin directly power a 12V relay coil?",
-     ["The Arduino pin cannot output current", "The Arduino output pin provides only 5V and a maximum of 40mA, which is insufficient for the relay coil voltage and current requirements", "The relay coil requires AC current", "The bootloader blocks direct relay connections"],
-     "B", "An Arduino digital pin operates at 5V and max 40mA. A 12V relay requires 12V, and even 5V relays typically draw 70-100mA, which exceeds the pin current limit and can damage the Arduino. A transistor switch (e.g. NPN) is required."),
-    (3, "Transistor driver for relay", "Hard",
-     "In a relay driver circuit, what is the purpose of using an NPN transistor?",
-     ["To amplify the frequency of the control signal", "To act as a buffer that uses the 5V low-current Arduino pin to switch a higher current from an external power supply through the relay coil", "To regulate the 12V power supply to 5V for the Arduino", "To prevent AC noise from reaching the USB port"],
-     "B", "The transistor acts as a switch: a small base current from the Arduino pin turns on the collector-emitter path, allowing a larger current to flow through the relay coil from an external power source."),
-    (3, "Flyback diode conduction state", "Hard",
-     "Under normal operation when the Arduino digital output is driving the transistor to activate a relay coil, is the flyback diode forward-biased or reverse-biased?",
-     ["Forward-biased", "Reverse-biased", "Conducting current", "Shorted out"],
-     "B", "During normal activation, the diode is reverse-biased (pointing from GND/transistor side to VCC) and does not conduct. It only conducts when the transistor switches off and the coil's collapsing magnetic field creates a reverse voltage spike."),
-    (3, "Tone function hardware timers impact", "Hard",
-     "What is a side effect of using the tone() function on an Arduino UNO?",
-     ["It disables analog inputs", "It interferes with PWM outputs on pins 3 and 11 because they share the same internal hardware timer (Timer 2)", "It slows down the Serial transmission rate", "It resets the bootloader"],
-     "B", "The tone() function uses Timer 2. Using tone() prevents PWM output (analogWrite) on pins 3 and 11.")
+    # Topic 5: Serial Communication (15 Questions: 5 Easy, 7 Medium, 3 Hard)
+    (5, "Easy", "Serial Initialization", "Which function is used to initialize serial communication at a specific baud rate?", 
+     ["Serial.start()", "Serial.begin()", "Serial.open()", "Serial.init()"], "B", "Serial.begin(speed) opens the serial port and sets the communication speed in bits per second (baud rate)."),
+    (5, "Easy", "Serial Transmit data", "Which function transmits data to the computer with a newline character appended at the end?", 
+     ["Serial.print()", "Serial.write()", "Serial.println()", "Serial.send()"], "C", "Serial.println() transmits data as ASCII text followed by a carriage return and newline characters."),
+    (5, "Easy", "Serial Receive availability", "Which function returns the number of bytes available for reading in the serial buffer?", 
+     ["Serial.read()", "Serial.available()", "Serial.peek()", "Serial.count()"], "B", "Serial.available() returns the count of bytes that have arrived and are stored in the serial receive buffer."),
+    (5, "Easy", "Serial Reading data", "Which function reads a single byte from the incoming serial buffer?", 
+     ["Serial.read()", "Serial.get()", "Serial.pop()", "Serial.receive()"], "A", "Serial.read() reads the next available byte from the incoming serial buffer (returning -1 if no data is available)."),
+    (5, "Easy", "Baud Rate definition", "What is 'baud rate' in serial communication?", 
+     ["The voltage level of the signal", "The frequency of the clock signal", "The speed of data transmission in bits per second", "The capacity of the internal buffer in bytes"], "C", "Baud rate defines the rate at which data is transferred over the serial communication channel (bits per second)."),
+    (5, "Medium", "SoftwareSerial vs HardwareSerial", "What is the purpose of the SoftwareSerial library?", 
+     ["To emulate USB host controller on SPI pins", "To allow serial communication on other digital pins using software pin-toggling", "To increase the hardware buffer to 512 bytes", "To bypass digital pins entirely"], "B", "SoftwareSerial allows using software-controlled digital pins for serial communication, useful when multiple serial connections are needed on boards with limited hardware UARTs."),
+    (5, "Medium", "Serial buffer size", "What is the default size of the hardware serial receive buffer in the Arduino core library for AVR boards?", 
+     ["16 bytes", "64 bytes", "128 bytes", "256 bytes"], "B", "By default, the serial buffer size in the Arduino core is 64 bytes. If the buffer overflows, oldest incoming bytes are discarded."),
+    (5, "Medium", "ASCII vs Binary transmission", "What is the difference between Serial.print(65) and Serial.write(65)?", 
+     ["print sends characters '6' and '5', write sends byte value 65 (char 'A')", "print sends 65 bytes, write sends 1 byte", "print uses I2C, write uses UART", "There is no difference"], "A", "Serial.print() converts data to human-readable ASCII text, whereas Serial.write() writes binary data directly to the serial port."),
+    (5, "Medium", "Serial non-blocking read", "What value is returned by Serial.read() if the receive buffer is empty?", 
+     ["0", "-1", "255", "Null"], "B", "Serial.read() returns -1 (an integer) to signal that there is no data in the buffer."),
+    (5, "Medium", "Serial Flush function", "What is the function of Serial.flush() in modern Arduino core versions?", 
+     ["It clears the receive buffer", "It blocks execution until all outgoing serial data has been fully transmitted", "It resets the baud rate", "It enables parity bits"], "B", "In current versions, Serial.flush() blocks until the transmit buffer is empty, ensuring all data is sent before proceeding."),
+    (5, "Medium", "Serial Parser functions", "Which function reads incoming serial data until a specific character delimiter (like a newline) is found?", 
+     ["Serial.readBytes()", "Serial.readStringUntil()", "Serial.parseInt()", "Serial.find()"], "B", "Serial.readStringUntil(terminator) reads characters from the serial buffer into a String until the specified terminator is met."),
+    (5, "Medium", "Hardware UART pins Uno", "Which pins are connected to the hardware Serial (UART) on the Arduino Uno board?", 
+     ["Pins 11 and 12", "Pins A4 and A5", "Pins 0 (RX) and 1 (TX)", "Pins 2 and 3"], "C", "Pins 0 (RX) and 1 (TX) are routed to the hardware UART, which is also linked to the onboard USB-to-serial converter."),
+    (5, "Hard", "While (!Serial) behavior", "What does the statement 'while (!Serial)' do, and on which boards is it required?", 
+     ["It loops until serial buffer is empty; required on Uno", "It loops until the USB CDC serial connection is established; required on Leonardo/Micro/Due", "It disables interrupts; required on Mega", "It checks if software serial is active; required on Nano"], "B", "On boards with native USB (like Leonardo, Micro, Due), the USB serial is dynamic. 'while (!Serial)' halts program execution until the USB port is opened by the computer."),
+    (5, "Hard", "SoftwareSerial limitation", "What is a major limitation of using SoftwareSerial at high baud rates?", 
+     ["It occupies all PWM pins", "It is processor-intensive and prone to data corruption/dropped bytes above 38400 or 57600 baud", "It disables digital output on all pins", "It requires 12V supply"], "B", "Because SoftwareSerial relies on software-driven pin change interrupts and precise software delay loops, it consumes significant processor cycles and becomes unreliable at high speeds."),
+    (5, "Hard", "Serial event handler", "How does the 'serialEvent()' function work within the Arduino execution loop?", 
+     ["It is an interrupt handler triggered instantly when a byte arrives", "It is called automatically at the end of each loop() iteration if serial data is available", "It runs in a separate thread", "It disables the bootloader"], "B", "serialEvent() is not a hardware interrupt. It is run sequentially by the hidden main() function immediately after loop() completes, provided there are bytes waiting in the hardware RX buffer."),
+
+    # Topic 6: I2C & SPI Protocols (15 Questions: 4 Easy, 8 Medium, 3 Hard)
+    (6, "Easy", "I2C Pins Uno", "Which Arduino Uno pins are used for I2C communication (SDA and SCL)?", 
+     ["Pins 11 and 13", "Pins A4 (SDA) and A5 (SCL)", "Pins 0 and 1", "Pins 2 and 3"], "B", "On the Uno, SDA is analog pin A4 and SCL is analog pin A5 (also duplicated near the AREF pin)."),
+    (6, "Easy", "SPI Pins Uno", "Which pins form the default SPI interface on the Arduino Uno?", 
+     ["Pins A4 and A5", "Pins 11 (MOSI), 12 (MISO), and 13 (SCK)", "Pins 0 and 1", "Pins 2 and 3"], "B", "Pins 11, 12, and 13 are the default hardware SPI pins on the Uno, with pin 10 often used as the default SS (Slave Select) pin."),
+    (6, "Easy", "I2C Library name", "Which library is included in the Arduino IDE to facilitate I2C communication?", 
+     ["SPI.h", "Wire.h", "LiquidCrystal.h", "I2C.h"], "B", "The Wire library handles I2C communication (Inter-Integrated Circuit) on Arduino boards."),
+    (6, "Easy", "SPI Library name", "Which library is used to communicate with high-speed SPI devices?", 
+     ["Wire.h", "SPI.h", "SoftwareSerial.h", "Ethernet.h"], "B", "The SPI library is used to communicate with devices using the Serial Peripheral Interface bus."),
+    (6, "Medium", "Bus Device addressing", "How are devices identified on an I2C bus?", 
+     ["By individual Chip Select (CS) wires", "By a unique 7-bit or 10-bit software address sent over the bus", "By their physical distance from the master", "By their baud rate configuration"], "B", "I2C uses a shared bus where each slave device is selected using its unique 7-bit or 10-bit hardware address."),
+    (6, "Medium", "I2C Bus speed", "What is the default clock speed of the I2C bus in the Wire library?", 
+     ["10 kHz", "100 kHz", "400 kHz", "1 MHz"], "B", "The default clock speed is 100 kHz (standard mode). It can be changed using Wire.setClock()."),
+    (6, "Medium", "I2C Master write sequence", "What is the correct sequence of Wire library commands to write data to an I2C device?", 
+     ["Wire.beginTransmission(), Wire.write(), Wire.endTransmission()", "Wire.write(), Wire.send()", "Wire.requestFrom(), Wire.read()", "Wire.beginTransmission(), Wire.read()"], "A", "Writing data involves initiating transmission, writing the bytes to a local buffer, and calling endTransmission() to physically send the data."),
+    (6, "Medium", "I2C Master read function", "Which function is used by an I2C master to request a specific number of bytes from a slave device?", 
+     ["Wire.requestFrom()", "Wire.read()", "Wire.beginTransmission()", "Wire.get()"], "A", "Wire.requestFrom(address, quantity) requests bytes from the slave device, which are then read using Wire.read()."),
+    (6, "Medium", "SPI Bus selection", "How does a master select a specific slave device on an SPI bus?", 
+     ["By sending a 7-bit address", "By pulling the specific Chip Select (CS) / Slave Select (SS) line LOW", "By sending a start byte", "By matching the clock polarity"], "B", "SPI uses a dedicated physical Slave Select (SS) line for each slave. Pulling the SS pin low activates the target slave."),
+    (6, "Medium", "SPI Data transfer method", "Which function is used to send and receive a byte simultaneously over the SPI bus?", 
+     ["SPI.write()", "SPI.transfer()", "SPI.send()", "SPI.read()"], "B", "SPI.transfer(val) writes a byte over MOSI and simultaneously reads a byte from MISO (duplex communication)."),
+    (6, "Medium", "I2C Pull-up requirement", "Why does I2C communication require pull-up resistors on both the SDA and SCL lines?", 
+     ["To limit current output from pins", "Because I2C uses open-drain/open-collector drivers that need pull-ups to pull the line HIGH", "To prevent voltage spikes above 12V", "To act as termination impedance"], "B", "I2C devices only pull the lines LOW. Pull-up resistors (normally 4.7k ohms) are required to pull the lines back to HIGH when no device is active."),
+    (6, "Medium", "SPI Speed limits", "What is the typical maximum speed of SPI communication on Arduino Uno compared to I2C?", 
+     ["It is slower than I2C", "Up to 8 MHz (half the system clock), which is much faster than I2C", "Exactly 100 kHz", "Limited to 115200 baud"], "B", "SPI is a synchronous bus that can run at up to 8 MHz on a 16 MHz Arduino Uno, significantly outpacing I2C speeds."),
+    (6, "Hard", "Wire.endTransmission status", "What is the meaning of a return value of 4 from the Wire.endTransmission() call?", 
+     ["Success", "Data too long to fit in transmit buffer", "Received NACK on transmit of address", "Other I2C bus error"], "D", "Wire.endTransmission() returns: 0 = success, 1 = data too long, 2 = NACK on address, 3 = NACK on data, 4 = other error (e.g., bus collision)."),
+    (6, "Hard", "SPI Transaction settings", "What is the purpose of using 'SPISettings' in modern SPI code?", 
+     ["To specify the I2C clock rate", "To define the SPI speed, bit order, and data mode (clock polarity/phase) for a specific device, ensuring compatibility when sharing the bus", "To increase the SPI buffer to 256 bytes", "To disable interrupts during transfer"], "B", "SPISettings allows configuring the bus speed, bit order, and data mode for each SPI slave, preventing clock conflicts when different devices share the same bus."),
+    (6, "Hard", "I2C Repeated Start condition", "How do you generate an I2C repeated start condition in the Wire library, and why is it useful?", 
+     ["Call Wire.begin() twice", "Pass 'false' as the parameter to Wire.endTransmission(false); it keeps the bus active to prevent other masters from interrupting", "Call Wire.requestFrom() with no parameters", "Pass 'true' to Wire.write(data, true)"], "B", "Passing false to endTransmission() prevents sending a STOP condition, maintaining master control of the bus for back-to-back read/write operations."),
+
+    # Topic 7: External Interrupts (15 Questions: 4 Easy, 8 Medium, 3 Hard)
+    (7, "Easy", "Interrupt Pin Uno", "Which pins on the Arduino Uno support external hardware interrupts?", 
+     ["Pins A0 and A1", "Pins 2 and 3", "Pins 11 and 12", "All digital pins"], "B", "The Uno supports external hardware interrupts only on digital pins 2 (Interrupt 0) and 3 (Interrupt 1)."),
+    (7, "Easy", "Attach Interrupt function", "Which function is used to link a digital pin to a specific interrupt handler function?", 
+     ["interrupts()", "attachInterrupt()", "setInterrupt()", "linkInterrupt()"], "B", "attachInterrupt(digitalPinToInterrupt(pin), ISR, mode) configures an external interrupt on the target pin."),
+    (7, "Easy", "Interrupt Disable function", "Which function is used to temporarily disable all interrupts on the Arduino?", 
+     ["noInterrupts()", "detachInterrupt()", "stopInterrupts()", "cli()"], "A", "noInterrupts() (equivalent to cli()) disables interrupts, which is useful for protecting time-critical code."),
+    (7, "Easy", "Interrupt Mode RISING", "When an interrupt is set to the 'RISING' mode, when does it trigger?", 
+     ["When the pin state is LOW", "When the pin transitions from LOW to HIGH", "When the pin transitions from HIGH to LOW", "When the pin changes state"], "B", "RISING triggers the interrupt when the input voltage rises from low to high."),
+    (7, "Medium", "Interrupt Mode CHANGE", "What does the interrupt mode 'CHANGE' represent?", 
+     ["Triggers when the pin goes HIGH", "Triggers when the pin goes LOW", "Triggers whenever the pin changes state from HIGH to LOW or LOW to HIGH", "Triggers at a set timer interval"], "C", "CHANGE triggers the ISR whenever the input pin transitions in either direction (rising or falling)."),
+    (7, "Medium", "Interrupt Service Routine constraints", "Which of the following is a rule that must be followed when writing an Interrupt Service Routine (ISR)?", 
+     ["The ISR must take float parameters", "The ISR should be as short and fast as possible, and cannot accept arguments or return values", "The ISR must use delay()", "The ISR must run at 115200 baud"], "B", "An ISR must be fast to avoid blocking the main execution path. It cannot accept arguments or return values, and blocking calls must be avoided."),
+    (7, "Medium", "DigitalPinToInterrupt macro", "Why is it recommended to use the 'digitalPinToInterrupt(pin)' macro inside attachInterrupt()?", 
+     ["It increases interrupt speed", "It translates the board's digital pin number to the correct internal hardware interrupt channel, ensuring code portability across different boards", "It debounces inputs", "It allocates RAM for the ISR"], "B", "Hardware interrupt channels (like INT0) map to different physical pins on different microcontrollers (e.g., Uno vs Mega). The macro ensures the correct channel is used dynamically."),
+    (7, "Medium", "noInterrupts safety window", "When is it necessary to call noInterrupts() and interrupts() in the main loop?", 
+     ["Before using analogWrite()", "When reading or writing a multi-byte variable that is modified inside an ISR, to prevent data corruption", "During serial data transmissions", "Every time loop() starts"], "B", "An ISR can trigger midway through reading a multi-byte variable (like a 4-byte long). Temporarily disabling interrupts prevents data corruption from partial reads."),
+    (7, "Medium", "Interrupt Mode FALLING", "When does an interrupt configured with the 'FALLING' trigger mode execute?", 
+     ["When the pin is HIGH", "When the pin transitions from HIGH to LOW", "When the pin transitions from LOW to HIGH", "When the pin is disconnected"], "B", "FALLING triggers the interrupt when the pin transitions from high (VCC) to low (GND)."),
+    (7, "Medium", "Interrupts Re-enabling", "Which function is used to re-enable interrupts after they have been disabled using noInterrupts()?", 
+     ["noInterrupts()", "interrupts()", "startInterrupts()", "sei()"], "B", "interrupts() (equivalent to sei()) re-enables interrupts after a temporary disable window."),
+    (7, "Medium", "Pin Change Interrupts", "What is the difference between External Interrupts and Pin Change Interrupts (PCINT) on AVR boards?", 
+     ["PCINT only work on analog pins", "External Interrupts are limited to specific pins; PCINT can be enabled on any digital pin, but are grouped in ports sharing one ISR", "PCINT are faster than external interrupts", "External interrupts cannot detect falling edges"], "B", "AVR chips support Pin Change Interrupts on all pins, but they share ISR vectors per port, requiring software checks to identify the active pin."),
+    (7, "Medium", "Interrupt Mode LOW", "What is a potential risk of using the 'LOW' interrupt mode?", 
+     ["It never triggers", "As long as the pin remains LOW, the interrupt will trigger continuously, blocking the main loop execution", "It is only compatible with analog pins", "It consumes too much flash memory"], "B", "The LOW mode triggers continuously as long as the pin stays low, potentially trapping the processor in the ISR and starving the main loop."),
+    (7, "Hard", "Reentrancy and Nested Interrupts", "Can an ISR be interrupted by another interrupt on an Arduino Uno by default?", 
+     ["Yes, higher priority interrupts always interrupt lower ones", "No, interrupts are disabled globally when entering an ISR; nested interrupts are not allowed unless manually enabled", "Yes, all interrupts run concurrently in threads", "Only if the watchdog timer is active"], "B", "AVR clears the global interrupt enable bit upon entering an ISR, disabling nested interrupts by default. Manual re-enabling inside the ISR is possible but discouraged."),
+    (7, "Hard", "Interrupt Variables race conditions", "What is a 'race condition' when dealing with interrupts in Arduino?", 
+     ["When the CPU clock runs faster than 16MHz", "A situation where the main program and an ISR access and modify a shared variable at the same time, leading to corrupted values", "When two interrupts are attached to the same pin", "When the serial baud rate is too fast"], "B", "A race condition occurs when asynchronous execution of the ISR modifies a shared variable while the main loop is in the middle of reading or writing it."),
+    (7, "Hard", "Debouncing interrupts", "Why is software debouncing inside an ISR using delay() not possible, and how should it be resolved?", 
+     ["delay() is disabled inside ISRs; resolve by checking the elapsed time since the last trigger using millis() or micros() and ignoring triggers that occur too quickly", "delay() compiles to code comments; use while loops", "ISRs do not support debouncing; use hardware filters only", "Use Serial.println() instead"], "A", "Since delay() relies on system interrupts that are disabled within an ISR, it will lock the program. Using a non-blocking time check (comparing current time with the last trigger timestamp) resolves the issue."),
+
+    # Topic 8: Standard Libraries (15 Questions: 4 Easy, 8 Medium, 3 Hard)
+    (8, "Easy", "Servo Pin attachment", "Which function in the Servo library is used to assign a servo motor to a specific digital pin?", 
+     ["Servo.pin()", "Servo.attach()", "Servo.write()", "Servo.connect()"], "B", "attach(pin) associates the Servo variable with a physical pin (which does not have to be a hardware PWM pin)."),
+    (8, "Easy", "Servo Angle write", "Which function is used to rotate a standard servo motor to a specific angle (e.g., 90 degrees)?", 
+     ["Servo.setAngle()", "Servo.write()", "Servo.move()", "Servo.rotate()"], "B", "write(angle) writes a value in degrees (typically 0 to 180) to control the shaft angle of the servo."),
+    (8, "Easy", "SD File opening", "Which function in the SD library is used to open a file on an SD card for reading or writing?", 
+     ["SD.open()", "SD.read()", "SD.file()", "SD.begin()"], "A", "SD.open(filename, mode) opens a file and returns a File object reference."),
+    (8, "Easy", "LCD Print function", "Which function is used to display text on a Character LCD screen using the LiquidCrystal library?", 
+     ["lcd.write()", "lcd.print()", "lcd.display()", "lcd.show()"], "B", "lcd.print() writes text characters to the LCD screen at the current cursor position."),
+    (8, "Medium", "Servo default angle", "What is the typical default pulse width range in microseconds used by the Servo library to sweep from 0 to 180 degrees?", 
+     ["1000 to 2000 us", "544 to 2400 us", "0 to 1023 us", "100 to 500 us"], "B", "The default pulse width limits are 544 microseconds (for 0 degrees) and 2400 microseconds (for 180 degrees)."),
+    (8, "Medium", "SD Card interface", "Which hardware communication protocol does the SD library use to interface with SD cards?", 
+     ["I2C", "SPI", "UART", "One-Wire"], "B", "SD cards communicate using the Serial Peripheral Interface (SPI) bus, requiring MOSI, MISO, SCK, and CS lines."),
+    (8, "Medium", "LiquidCrystal pin configurations", "In the constructor 'LiquidCrystal lcd(RS, Enable, D4, D5, D6, D7)', how many data pins are being used to drive the LCD?", 
+     ["8-bit mode (8 pins)", "4-bit mode (4 pins)", "I2C mode (2 pins)", "Serial mode (1 pin)"], "B", "This constructor initializes the LCD in 4-bit mode, using 4 data lines (D4-D7) plus RS and Enable controls to save pins."),
+    (8, "Medium", "SD File flush importance", "Why is it important to call File.close() or File.flush() after writing data to an SD card?", 
+     ["To free up SRAM memory", "To ensure data is written from the volatile write buffer to the physical SD card, preventing data loss", "To clear the SPI registers", "To enable interrupts"], "B", "The SD library buffers writes in RAM. Calling close() or flush() forces the buffer to write to the physical card, preventing file corruption if power is lost."),
+    (8, "Medium", "Servo writeMicroseconds usage", "What is the benefit of using 'writeMicroseconds()' instead of 'write()' in the Servo library?", 
+     ["It makes the servo spin faster", "It allows setting the pulse width directly for higher resolution and precision", "It reduces current consumption", "It works without attaching a pin"], "B", "writeMicroseconds() bypasses the 0-180 degree conversion, allowing direct setting of the pulse width for precise positioning."),
+    (8, "Medium", "LCD cursor setting", "Which command is used to move the cursor to the first character of the second row on a 16x2 character LCD?", 
+     ["lcd.setCursor(1, 1)", "lcd.setCursor(0, 1)", "lcd.setCursor(1, 0)", "lcd.setCursor(0, 2)"], "B", "lcd.setCursor(col, row) is 0-indexed. Moving to the first character of the second row is setCursor(0, 1)."),
+    (8, "Medium", "SD Card format requirement", "Which file system format is required on SD cards for compatibility with the standard SD library?", 
+     ["NTFS", "FAT16 or FAT32", "exFAT", "ext4"], "B", "The standard SD library supports only FAT16 and FAT32 file systems. Larger or differently formatted cards will fail to initialize."),
+    (8, "Medium", "SD filename limit", "What is the filename length restriction in the standard SD library (excluding SD Fat variants)?", 
+     ["No limit", "8.3 format (up to 8 characters for name, 3 for extension)", "32 characters", "256 characters"], "B", "The standard SD library uses the 8.3 filename format (e.g., 'data.txt'), failing to open longer filenames."),
+    (8, "Hard", "Servo library timer conflict", "How does the Servo library on Arduino Uno impact the functionality of PWM pins 9 and 10?", 
+     ["It doubles their frequency", "It disables analogWrite() PWM capability on digital pins 9 and 10", "It converts them to analog inputs", "It has no impact"], "B", "On the Uno, the Servo library uses Timer 1. Since Timer 1 also drives PWM on pins 9 and 10, PWM functionality on those pins is disabled when using the library."),
+    (8, "Hard", "SD Card CS line requirements", "Why must the hardware SS pin (pin 10 on Uno) be set to OUTPUT even if a different pin is used as the SD card's Chip Select (CS)?", 
+     ["To provide power to the SD card", "To force the SPI interface into Master mode; if left as an INPUT set to LOW, the SPI hardware enters Slave mode, breaking communication", "To act as a clock reference", "To disable external interrupts"], "B", "The hardware SS pin must be configured as an output (or held high if input) to keep the AVR SPI hardware in Master mode."),
+    (8, "Hard", "LiquidCrystal timing requirements", "Why does the LiquidCrystal library contain short delay calls (like delayMicroseconds) within its functions?", 
+     ["To debounce button inputs", "To accommodate the relatively slow internal controller (like the HD44780) of character LCD modules", "To sync with I2C baud rate", "To prevent float errors"], "B", "Standard character LCD controllers operate slowly. The library includes brief delays to meet the setup and hold time requirements of the LCD controller."),
+
+    # Topic 9: MicroPython on Arduino (15 Questions: 4 Easy, 8 Medium, 3 Hard)
+    (9, "Easy", "MicroPython Definition", "What is MicroPython?", 
+     ["A compiler that converts C++ to Python", "A lean and efficient implementation of the Python 3 programming language optimized to run on microcontrollers", "An IDE designed by Arduino", "A Python library for serial graphing"], "B", "MicroPython is a lightweight Python 3 implementation designed specifically for constrained embedded systems."),
+    (9, "Easy", "MicroPython import modules", "Which module is imported in MicroPython to interact with hardware components like pins and ADC?", 
+     ["sys", "machine", "time", "math"], "B", "The 'machine' module contains classes (Pin, ADC, PWM, I2C, SPI) for hardware control in MicroPython."),
+    (9, "Easy", "MicroPython delay function", "Which function is used in MicroPython to pause execution for a specified number of seconds?", 
+     ["time.sleep()", "time.delay()", "time.wait()", "machine.sleep()"], "A", "In MicroPython, the 'time' module's sleep(seconds) function is used for delays."),
+    (9, "Easy", "MicroPython Pin declaration", "How do you configure pin 2 as a digital output in MicroPython?", 
+     ["pinMode(2, OUTPUT)", "pin = Pin(2, Pin.OUT)", "pin = Pin(2, OUTPUT)", "pin.config(2, OUT)"], "B", "In MicroPython, pins are configured using the Pin constructor: `Pin(2, Pin.OUT)`."),
+    (9, "Medium", "MicroPython shell REPL", "What does 'REPL' stand for in MicroPython?", 
+     ["Reset, Execute, Program, Loop", "Read-Eval-Print Loop", "Real-Time Embedded Programming Language", "Receive, Encrypt, Process, Log"], "B", "REPL stands for Read-Eval-Print Loop, an interactive command-line interface for executing Python commands on the board."),
+    (9, "Medium", "C++ vs MicroPython timing", "How does loop frequency compare between C++ and MicroPython on the same board?", 
+     ["MicroPython is faster", "C++ is significantly faster because it compiles to native machine code, whereas MicroPython is interpreted at runtime", "They run at the exact same speed", "MicroPython uses 12V to increase speed"], "B", "C++ compiles directly to machine code, achieving much faster loop speeds than interpreted MicroPython code."),
+    (9, "Medium", "MicroPython Pin value set", "What is the correct syntax to set a MicroPython Pin object named 'led' to a high state?", 
+     ["led.high() or led.value(1)", "led.write(HIGH)", "led.digitalWrite(1)", "led(ON)"], "A", "In MicroPython, you set a pin state by calling value(1) or the high() method on the Pin object."),
+    (9, "Medium", "MicroPython ADC reading", "How do you read an analog voltage from an ADC object named 'adc' in MicroPython?", 
+     ["adc.read() or adc.read_u16()", "analogRead(adc)", "adc.digitalRead()", "adc.get_value()"], "A", "MicroPython uses the read() or read_u16() methods on the ADC object, returning values normalized up to 16 bits (0-65535)."),
+    (9, "Medium", "MicroPython PWM duty cycle", "Which method is used to set the PWM duty cycle for a PWM object in MicroPython?", 
+     ["pwm.write(duty)", "pwm.duty() or pwm.duty_u16()", "pwm.duty_cycle()", "pwm.analogWrite()"], "B", "MicroPython's PWM class uses the duty() or duty_u16() methods to set the pulse width duty cycle."),
+    (9, "Medium", "MicroPython runtime dynamic typing", "What is a key difference in variable declaration between C++ and MicroPython?", 
+     ["MicroPython requires type definitions (like int, float)", "MicroPython is dynamically typed, meaning variables do not require explicit type declarations", "MicroPython variables are always 16-bit", "MicroPython does not support arrays"], "B", "Unlike C++, which requires static type definitions, MicroPython is dynamically typed and assigns types at runtime based on the value."),
+    (9, "Medium", "MicroPython Pin Pull-up", "How do you configure an input pin with an internal pull-up resistor enabled in MicroPython?", 
+     ["Pin(5, Pin.IN, Pin.PULL_UP)", "Pin(5, Pin.INPUT_PULLUP)", "Pin(5, Pin.IN_PULLUP)", "Pin(5, Pin.IN, pull=Pin.PULL_UP)"], "D", "In MicroPython, the pull parameter is passed to the constructor, e.g., `Pin(5, Pin.IN, pull=Pin.PULL_UP)`."),
+    (9, "Medium", "MicroPython GC function", "What is the purpose of the 'gc.collect()' call in MicroPython?", 
+     ["To reset the processor", "To trigger garbage collection, releasing unused memory blocks back to the heap", "To compile scripts", "To verify pin configurations"], "B", "gc.collect() runs the garbage collector to clean up dereferenced objects and free RAM, which is important for preventing memory exhaustion in long-running scripts."),
+    (9, "Hard", "MicroPython interrupt rules", "Why should MicroPython ISRs avoid allocating memory (like creating lists or formatting strings)?", 
+     ["It disables the REPL", "Memory allocation is forbidden during ISR execution in MicroPython and will raise a RuntimeError", "It slows down the I2C clock", "It overrides global variables"], "B", "ISRs run in a restricted context where memory allocation on the heap is not permitted. Allocating memory throws an exception, crashing the script."),
+    (9, "Hard", "MicroPython micropython.alloc_emergency_exception_buf", "What is the purpose of 'micropython.alloc_emergency_exception_buf(100)' in MicroPython?", 
+     ["To speed up arithmetic operations", "To allocate a buffer for printing exception tracebacks from inside ISRs without needing heap allocation", "To store variables during deep sleep", "To increase the REPL history size"], "B", "Since heap allocation is disabled in ISRs, formatting tracebacks fails. The emergency buffer provides a reserved area to display ISR errors reliably."),
+    (9, "Hard", "MicroPython firmware differences", "What is stored in the bootloader flash section compared to the MicroPython interpreter firmware on a board?", 
+     ["The bootloader launches the USB mass storage mode, while the MicroPython firmware interprets the Python scripts", "The bootloader contains the Python scripts", "The bootloader compiles scripts to C++", "There is no bootloader in MicroPython"], "A", "The bootloader is responsible for loading the interpreter firmware. The interpreter firmware is what parses and executes your Python scripts (like main.py)."),
+
+    # Topic 10: Arduino IoT Cloud & API (15 Questions: 4 Easy, 8 Medium, 3 Hard)
+    (10, "Easy", "IoT Cloud definition", "What is Arduino IoT Cloud?", 
+     ["A local offline database compiler", "A service that allows users to monitor, control, and log data from connected devices using a web dashboard", "A replacement for C++ language", "A Python module for machine learning"], "B", "Arduino IoT Cloud is a platform for building IoT applications, allowing remote monitoring and control via dashboards."),
+    (10, "Easy", "IoT Dashboard widgets", "What is a dashboard widget in the Arduino IoT Cloud?", 
+     ["A hardware relay shield", "A graphical user interface element (like a slider, switch, or chart) connected to a cloud variable", "A software library for AVR chips", "A custom sensor calibration tool"], "B", "Widgets are interactive UI elements on the dashboard that display data or control cloud variables in real time."),
+    (10, "Easy", "IoT Cloud variables", "What are 'Cloud Variables' in the context of Arduino IoT Cloud?", 
+     ["Variables stored in external EEPROM", "Variables synchronized automatically between the physical device and the cloud platform", "Variables that cannot be changed", "Variables representing analog pin counts"], "B", "Cloud variables are variables defined in your sketch that automatically sync with the cloud when their values change."),
+    (10, "Easy", "IoT Cloud Connectivity", "Which connectivity options are commonly supported by Arduino IoT Cloud compatible boards?", 
+     ["Only USB serial", "Wi-Fi, Ethernet, and cellular networks", "Only Bluetooth Low Energy", "Parallel bus cables"], "B", "Compatible boards connect to the cloud using Wi-Fi, Ethernet, or cellular networks, depending on their hardware features."),
+    (10, "Medium", "IoT Cloud setup function", "Which function is called inside setup() to initialize the Arduino IoT Cloud configuration?", 
+     ["ArduinoCloud.begin()", "ArduinoCloud.init()", "IoT.begin()", "Cloud.start()"], "A", "ArduinoCloud.begin() is called inside setup() to initialize connectivity and cloud variables."),
+    (10, "Medium", "Cloud Variables sync policy", "What is the difference between 'On Change' and 'Periodic' variable sync policies?", 
+     ["On Change updates only when the value changes; Periodic updates at a set interval", "On Change requires an interrupt pin; Periodic uses delay()", "On Change saves power; Periodic uses USB", "There is no difference"], "A", "On Change updates the cloud only when the variable's value changes, while Periodic sends updates at a set time interval regardless of value changes."),
+    (10, "Medium", "Cloud update call", "What is the function of the 'ArduinoCloud.update()' call placed inside the loop() function?", 
+     ["It compiles the sketch", "It handles background tasks, keeping the connection alive and synchronizing variables with the cloud", "It resets the board if disconnected", "It reads analog pins"], "B", "ArduinoCloud.update() must be called frequently in loop() to manage connectivity, process incoming messages, and sync variables."),
+    (10, "Medium", "IoT Cloud things", "What represents a 'Thing' in the Arduino IoT Cloud architecture?", 
+     ["A physical sensor module", "The virtual representation of a device, grouping configuration settings, cloud variables, and network credentials", "An I2C bus address", "A dashboard widget"], "B", "A 'Thing' represents a device configuration, grouping its variables, linked hardware, and network details."),
+    (10, "Medium", "IoT Cloud REST API", "What is the purpose of the Arduino IoT Cloud REST API?", 
+     ["To program Arduino boards using Python", "To allow external applications to interact with cloud variables, dashboards, and device metadata programmatically", "To route SPI traffic", "To flash the bootloader"], "B", "The REST API allows external systems (like web apps or mobile apps) to query and modify cloud data programmatically."),
+    (10, "Medium", "IoT Cloud security", "How are communications secured between an Arduino board and the IoT Cloud?", 
+     ["By using standard plain text serial", "By using SSL/TLS encryption, often supported by a hardware crypto-chip on the board", "By limiting communication to 9600 baud", "By disabling all external interrupts"], "B", "Data is encrypted using SSL/TLS. Compatible boards typically feature a crypto-element (like the ATECC608 chip) for secure key storage and encryption acceleration."),
+    (10, "Medium", "IoT Cloud read-only variables", "What happens when a cloud variable is configured as 'Read Only' in the IoT Cloud interface?", 
+     ["The variable cannot be read by the board", "The board can write to the variable to update the cloud, but the dashboard cannot modify it", "The dashboard can write to it, but the board cannot read it", "The variable is stored in flash"], "B", "Read-only variables are updated by the board to send status to the dashboard; the dashboard cannot modify them."),
+    (10, "Medium", "IoT Cloud write-only variables", "What is the purpose of the callback function generated for a 'Read & Write' cloud variable?", 
+     ["To measure analog input voltage", "It is executed on the board whenever a new value is received from the cloud dashboard", "To reset the Wi-Fi credentials", "To calibrate sensor readings"], "B", "Read-Write variables generate an 'onVarChange()' callback on the board, which runs automatically when the dashboard sends a new value."),
+    (10, "Hard", "IoT Cloud watchdog utility", "Why does the Arduino IoT Cloud library include an internal watchdog or connection timeout check?", 
+     ["To speed up compiling", "To automatically reset the board or reconnect if the internet connection hangs, preventing devices from going offline permanently", "To limit current on digital pins", "To clear the SRAM"], "B", "An internal connection check prevents remote devices from hanging indefinitely in a disconnected state by forcing a reconnect or system reset."),
+    (10, "Hard", "IoT Cloud credentials storage", "Where is the unique private key of an Arduino IoT Cloud device stored for authentication?", 
+     ["In the sketch code as plain text", "In the hardware cryptochip (like ATECC608A/B) on the board during registration", "In the USB serial controller", "In the bootloader"], "B", "The unique device key is generated and stored securely inside the onboard crypto-authentication chip, preventing exposure in the source code."),
+    (10, "Hard", "IoT Cloud webhooks integration", "How can you trigger an external service (like sending an Slack message or updating a Google Sheet) when an IoT Cloud variable changes?", 
+     ["By using Port Manipulation", "By configuring Webhooks in the IoT Cloud Thing settings to POST events to an external URL", "By adding SoftwareSerial code", "By modifying the bootloader"], "B", "Webhooks can be configured to send JSON payloads to external endpoints whenever variables update, facilitating third-party integrations.")
 ]
 
-for idx, item in enumerate(mcqs_data):
-    topic_id, lo, diff, q, opts, ans, exp = item
-    mcqs.append({
-        "id": f"MCQ_{idx+1:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
+# 60 True/False
+# Format: (topic_id, "Difficulty", "Objective", "Statement", "CorrectAnswer", "Explanation")
+tfs_raw = [
+    # Topic 1: Sketch Structure & Control Flow
+    (1, "Easy", "Sketch requirements", "An Arduino C++ sketch must always define both setup() and loop() functions to compile successfully.", "True", "The Arduino toolchain requires both entry points to build the executable loop properly."),
+    (1, "Medium", "C++ case sensitivity", "Keywords and variable names in Arduino C++ are case-insensitive.", "False", "C++ is case-sensitive; 'ledPin' and 'ledpin' are treated as two distinct variables."),
+    (1, "Medium", "Preprocessor replacement", "The #define directive creates variable allocations in SRAM.", "False", "#define is a preprocessor macro directive that performs text replacement before compilation, consuming no memory at runtime."),
+    (1, "Medium", "Variable scopes", "A global variable can be accessed by any function within the same sketch.", "True", "Global variables are declared outside of functions and have a scope that extends throughout the file."),
+    (1, "Hard", "Volatile keyword optimization", "Declaring a variable as 'volatile' makes code execution faster by allowing compiler register caching.", "False", "Volatile prevents register caching, forcing RAM lookups, which makes access slightly slower but safe for ISRs."),
+    (1, "Hard", "Short-circuit boolean evaluation", "In the expression (A || B), if A is evaluated as true, B will still be evaluated.", "False", "Logical OR uses short-circuit evaluation. If the first operand is true, the overall result must be true, so B is skipped."),
+
+    # Topic 2: Data Types & Variables
+    (2, "Easy", "Boolean storage size", "A boolean variable in Arduino C++ consumes exactly 1 bit of RAM.", "False", "The smallest addressable unit of memory is a byte, so a boolean occupies 1 byte (8 bits) of RAM."),
+    (2, "Medium", "Float type parameters", "An integer variable can store values with decimal parts.", "False", "Integers can only store whole numbers; fractional parts are truncated during assignment."),
+    (2, "Medium", "Unsigned integer limits", "An unsigned int variable on an Arduino Uno can store negative numbers.", "False", "Unsigned variables can only represent positive integers and zero."),
+    (2, "Medium", "Static variables persistence", "A static local variable inside a function is destroyed and recreated every time the function exits and is re-entered.", "False", "Static local variables retain their values across function calls and exist for the lifetime of the program."),
+    (2, "Hard", "Float exact comparison", "Comparing floating-point values for exact equality (==) is recommended for safety.", "False", "Rounding errors in floating-point math make exact comparisons risky; a delta comparison should be used instead."),
+    (2, "Hard", "Sizeof pointer behavior", "Using sizeof() on a pointer returns the size of the array it points to.", "False", "sizeof() on a pointer returns the size of the pointer itself (2 bytes on AVR, 4 bytes on 32-bit platforms), not the target object's size."),
+
+    # Topic 3: Digital & Analog I/O
+    (3, "Easy", "pinMode INPUT_PULLUP", "Setting a pin to INPUT_PULLUP enables an internal resistor that pulls the input voltage level HIGH.", "True", "INPUT_PULLUP activates the internal pull-up resistor (20k-50k ohms) to hold the pin high by default."),
+    (3, "Easy", "analogWrite PWM dependency", "analogWrite() can produce a true variable analog voltage output on any digital pin on the Arduino Uno.", "False", "analogWrite() outputs a PWM signal (pulsing high and low), not a true analog voltage, and is limited to specific PWM pins."),
+    (3, "Medium", "analogRead default range", "On an Arduino Uno, the analogRead() function returns values ranging from 0 to 255.", "False", "analogRead() on the Uno uses a 10-bit ADC, returning values from 0 to 1023."),
+    (3, "Medium", "digitalWrite on Input Pin", "Calling digitalWrite(pin, HIGH) on a pin configured as INPUT activates the internal pull-up resistor on AVR boards.", "True", "In legacy Arduino C++, writing HIGH to an input pin is the alternative method to enable the internal pull-up resistor."),
+    (3, "Medium", "ADC Reference safety", "Applying a voltage to the AREF pin before calling analogReference(EXTERNAL) can short-circuit and damage the microcontroller.", "True", "If the internal reference is active, it will clash with the external voltage on AREF, potentially burning out the ADC mux hardware."),
+    (3, "Hard", "analogWrite frequency variability", "The PWM frequency on pins 5 and 6 of an Arduino Uno is slightly higher than on pins 9 and 10.", "True", "Timer 0 drives pins 5 and 6 at ~980 Hz, while Timer 1 drives pins 9 and 10 at ~490 Hz."),
+
+    # Topic 4: Time & Timing
+    (4, "Easy", "delay blocking behavior", "The delay() function pauses the execution of the entire program, blocking other operations.", "True", "delay() is a blocking function; it loops the CPU until the time elapsed, preventing other code from running."),
+    (4, "Easy", "millis time unit", "The millis() function returns the time elapsed in microseconds.", "False", "millis() returns the elapsed time in milliseconds (1/1000th of a second)."),
+    (4, "Medium", "millis Rollover handling", "Using subtraction (currentTime - previousTime) prevents timing bugs when millis() rolls over.", "True", "Unsigned subtraction correctly wraps around, ensuring accurate interval checks even during rollover."),
+    (4, "Medium", "delayMicroseconds accuracy limits", "delayMicroseconds() can accurately pause for intervals of up to 1 second.", "False", "delayMicroseconds() is only accurate for values up to 16,383 microseconds (~16 milliseconds)."),
+    (4, "Medium", "delay inside ISR", "The delay() function works perfectly inside an Interrupt Service Routine (ISR) on an Arduino Uno.", "False", "Inside an ISR, interrupts are disabled. Since delay() relies on Timer 0 interrupts to increment system time, it will block permanently."),
+    (4, "Hard", "Timer 0 PWM side-effects", "Modifying Timer 0 registers directly will alter the timing rate of millis() and delay() functions.", "True", "Since Timer 0 is used for system timekeeping, changing its prescaler will speed up or slow down millis() and delay()."),
+
+    # Topic 5: Serial Communication
+    (5, "Easy", "Serial Baud Rate matching", "The baud rate specified in Serial.begin() must match the baud rate configured in the serial monitor for correct data display.", "True", "Mismatched baud rates result in corrupted characters (gibberish) due to timing synchronization mismatch."),
+    (5, "Easy", "Serial print vs write", "Serial.print() and Serial.write() transmit data in the exact same format.", "False", "print() converts data to ASCII characters, while write() transmits raw binary bytes directly."),
+    (5, "Medium", "Serial available blocking", "The Serial.available() function blocks program execution until serial data arrives.", "False", "Serial.available() is non-blocking; it immediately returns 0 if the receive buffer is empty."),
+    (5, "Medium", "Serial buffer overflow", "If incoming serial data exceeds 64 bytes without being read, the oldest data in the buffer is overwritten.", "False", "New incoming bytes are discarded when the 64-byte buffer is full; the existing buffer contents are preserved."),
+    (5, "Medium", "while(!Serial) role", "The line 'while (!Serial)' is necessary on all Arduino boards to start serial communication.", "False", "It is only required on boards with native USB CDC (like Leonardo, Due, Nano 33 IoT) to wait for a USB connection."),
+    (5, "Hard", "SoftwareSerial duplex limits", "The SoftwareSerial library can transmit and receive data simultaneously at high speeds without issues.", "False", "SoftwareSerial cannot transmit and receive at the same time reliably because it relies on software-toggled timing loops."),
+
+    # Topic 6: I2C & SPI Protocols
+    (6, "Easy", "I2C wire requirements", "The I2C protocol requires only two signal wires (SDA and SCL) to communicate with multiple devices.", "True", "I2C uses a shared bus, requiring only SDA (data) and SCL (clock) lines, plus ground."),
+    (6, "Easy", "SPI speed comparison", "SPI communication is generally slower than I2C communication.", "False", "SPI is a full-duplex protocol that can run at much higher clock speeds than I2C."),
+    (6, "Medium", "I2C bus addressing", "Multiple devices with the same I2C address can share the same Wire bus without any conflict.", "False", "Each device on an I2C bus must have a unique address for the master to direct communication without conflict."),
+    (6, "Medium", "SPI hardware lines", "The SPI bus requires dedicated lines for MOSI, MISO, and SCK, but uses individual Chip Select (CS) lines for each slave.", "True", "SPI shares clock and data lines but requires a dedicated CS line for each slave device to enable it."),
+    (6, "Medium", "Wire endTransmission status", "Wire.endTransmission() actually sends all buffered data and returns status details about the transaction.", "True", "Calling endTransmission() executes the I2C transaction and returns status codes indicating success or specific errors."),
+    (6, "Hard", "I2C repeated start support", "The Wire library does not support generating a repeated start condition on the I2C bus.", "False", "Passing 'false' to Wire.endTransmission(false) holds the bus active, creating a repeated start condition."),
+
+    # Topic 7: External Interrupts
+    (7, "Easy", "Interrupt pin limits Uno", "All digital pins on the Arduino Uno can be used as external hardware interrupts.", "False", "Only digital pins 2 and 3 support external hardware interrupts on the Uno."),
+    (7, "Easy", "ISR return value constraints", "An Interrupt Service Routine (ISR) can return a value using the 'return' statement.", "False", "An ISR must be declared with a void return type and cannot return any value."),
+    (7, "Medium", "volatile variable requirement", "Any global variable modified inside an ISR and read elsewhere must be declared as volatile.", "True", "The volatile keyword prevents the compiler from caching the variable in registers, ensuring updates are read from RAM."),
+    (7, "Medium", "Interrupt RISING mode", "The RISING interrupt mode triggers when the pin transitions from HIGH to LOW.", "False", "RISING mode triggers on a LOW-to-HIGH transition; HIGH-to-LOW is handled by the FALLING mode."),
+    (7, "Medium", "nested interrupts status", "On standard AVR boards, interrupts are automatically re-enabled inside an ISR, allowing nested interrupts by default.", "False", "AVR disables interrupts globally upon entering an ISR. Nested interrupts do not occur unless manually re-enabled."),
+    (7, "Hard", "ISR parameters constraint", "An ISR function can accept arguments, provided they are integers.", "False", "An ISR function cannot accept any arguments; it must have a void parameter list."),
+
+    # Topic 8: Standard Libraries
+    (8, "Easy", "Servo PWM pin requirements", "The Servo library can control servo motors on any digital pin, not just hardware PWM pins.", "True", "The Servo library uses software-controlled timer interrupts to drive servo control pulses on any digital pin."),
+    (8, "Easy", "SD file naming rules", "The standard SD library supports long filenames of up to 256 characters by default.", "False", "The standard SD library is restricted to the 8.3 filename format (up to 8 characters plus a 3-character extension)."),
+    (8, "Medium", "LCD 4-bit vs 8-bit connection", "Using the LiquidCrystal library in 4-bit mode requires fewer pins than 8-bit mode but still displays the same content.", "True", "4-bit mode uses only 4 data pins instead of 8, saving 4 digital I/O pins while maintaining display capabilities."),
+    (8, "Medium", "SD card write caching", "Data written to an SD card using File.print() is immediately saved to the card, even if the file is not closed.", "False", "Data is cached in RAM. It is only written to the card when close() or flush() is called."),
+    (8, "Medium", "Servo library Timer 1 conflict", "Using the Servo library on an Arduino Uno disables PWM functionality on digital pins 9 and 10.", "True", "The Servo library uses Timer 1 on the Uno. This disables PWM capability on pins 9 and 10, which rely on Timer 1."),
+    (8, "Hard", "SD card SPI SS input trap", "Leaving the hardware SS pin (pin 10 on Uno) as an INPUT set to LOW will disable the SPI Master mode.", "True", "If SS is configured as an input and pulled LOW, the SPI hardware switches to Slave mode, breaking communication with the SD card."),
+
+    # Topic 9: MicroPython on Arduino
+    (9, "Easy", "MicroPython interpreted nature", "MicroPython code runs faster than compiled C++ code on the same microcontroller.", "False", "C++ compiles to native machine code, whereas MicroPython is interpreted at runtime, making C++ faster."),
+    (9, "Easy", "MicroPython machine module", "The 'machine' module in MicroPython is used to control hardware peripherals.", "True", "The machine module contains standard classes for controlling I/O pins, ADCs, PWM, I2C, and SPI."),
+    (9, "Medium", "MicroPython dynamic variables", "In MicroPython, you must declare variable types (like int or float) before using them.", "False", "MicroPython is a dynamically typed language; variables are declared on assignment without explicit type declarations."),
+    (9, "Medium", "MicroPython ADC scaling", "MicroPython's ADC.read_u16() method returns an analog measurement scaled to a 16-bit range (0 to 65535).", "True", "The read_u16() method normalizes all analog readings to a 16-bit unsigned integer (0-65535) for consistency across boards."),
+    (9, "Medium", "MicroPython ISR memory restrictions", "An ISR in MicroPython is allowed to allocate dynamic memory (such as creating lists).", "False", "MicroPython ISRs cannot allocate memory on the heap. Doing so throws a RuntimeError within the interrupt handler."),
+    (9, "Hard", "MicroPython REPL interactivity", "The MicroPython REPL allows users to test code line-by-line interactively on the board.", "True", "REPL (Read-Eval-Print Loop) provides an interactive command prompt for executing Python commands on the fly over serial."),
+
+    # Topic 10: Arduino IoT Cloud & API
+    (10, "Easy", "IoT Cloud dashboard widgets", "Dashboard widgets in the Arduino IoT Cloud must be manually linked to cloud variables to display data.", "True", "Widgets are interface elements that must be bound to specific variables to sync data or send controls."),
+    (10, "Easy", "IoT Cloud variables synchronization", "Cloud variables are automatically updated in the cloud without requiring internet connectivity.", "False", "Internet connectivity (Wi-Fi, Cellular, etc.) is required for the library to sync variable states with the cloud."),
+    (10, "Medium", "IoT Cloud loop requirement", "The ArduinoCloud.update() function must be called frequently in the loop() function.", "True", "ArduinoCloud.update() handles background tasks, synchronizes variables, and maintains connection status."),
+    (10, "Medium", "IoT Cloud sync policies", "A cloud variable with an 'On Change' sync policy will update the cloud even if its value remains the same.", "False", "The 'On Change' sync policy only transmits updates to the cloud when the variable's value changes, conserving bandwidth."),
+    (10, "Medium", "IoT Cloud secure authentication", "The unique cryptographic key used to authenticate a board with the IoT Cloud is stored as plain text in the sketch.", "False", "The authentication key is stored securely in the onboard hardware crypto-chip (like ATECC608), keeping it hidden from source code."),
+    (10, "Hard", "IoT Cloud Webhooks usage", "IoT Cloud Webhooks allow triggering external APIs when a cloud variable changes value.", "True", "Webhooks send POST payloads to configured external URLs on variable changes, facilitating third-party integrations.")
+]
+
+# 60 Scenarios
+# Format: (topic_id, "Difficulty", "Objective", "Scenario", "Question", "CorrectAnswer", "Explanation")
+scenarios_raw = [
+    # Topic 1: Sketch Structure & Control Flow
+    (1, "Easy", "Setup configuration error", 
+     "A student wants to blink an LED on pin 13 but forgets to configure the pin using 'pinMode(13, OUTPUT)'. They write 'digitalWrite(13, HIGH); delay(1000); digitalWrite(13, LOW);' inside the loop().", 
+     "What will be the behavior of the LED?", 
+     "B", 
+     "Without configuring the pin as an output, the pin defaults to input. In AVR chips, digitalWrite(13, HIGH) on an input pin enables the internal pull-up resistor, lighting the LED very dimly due to high resistance (~30k-50k ohms)."),
+    
+    (1, "Medium", "Loop execution flow", 
+     "A developer places a block of sensor calibration code inside the setup() function and expects it to run once when the device starts. Later, they need the calibration code to run whenever a button is pressed during program execution.", 
+     "How should they refactor the code?", 
+     "C", 
+     "Moving the calibration logic to a separate helper function allows it to be called from both setup() (during startup) and loop() (upon button press events)."),
+    
+    (1, "Medium", "Modulo operator application", 
+     "An engineer wants a specific warning buzzer on pin 8 to beep only on every 10th iteration of a loop that tracks a sensor count variable.", 
+     "Which condition should they check inside the loop?", 
+     "A", 
+     "Checking 'if (count % 10 == 0)' uses the modulo operator (%) to evaluate the remainder. When count is a multiple of 10, the remainder is 0, triggering the buzzer."),
+    
+    (1, "Medium", "Infinite loop trap", 
+     "A programmer writes 'while (analogRead(A0) < 500) { digitalWrite(13, HIGH); }' inside the loop() function. The analog reading is 400 when the loop starts, and no other code modifies the state inside the while loop.", 
+     "What will happen to the execution of the program?", 
+     "B", 
+     "Since the analog reading is not updated inside the while loop body, the condition remains true indefinitely. The processor is trapped in an infinite loop, and the rest of the program halts."),
+    
+    (1, "Hard", "Recursion memory crash", 
+     "An embedded developer designs a nested search algorithm on an Arduino Uno that uses recursive function calls. During stress testing, the board suddenly resets or crashes whenever the search depth exceeds 25 levels.", 
+     "What is the most likely cause of this crash?", 
+     "B", 
+     "Deep recursion on the Uno (which has only 2KB of RAM) causes stack overflow. The stack collides with the heap/global variables, corrupting memory and triggering crashes or watchdog resets."),
+    
+    (1, "Hard", "Namespace conflicts resolution", 
+     "A developer integrates two different external libraries that both define a function named 'calculateTemperature()'. The sketch fails to compile due to a 'redefinition of function' error.", 
+     "How can this compile conflict be resolved without modifying the library source files?", 
+     "C", 
+     "If the libraries do not use namespaces, the developer must wrap the library headers or calls in distinct namespaces or declare the functions as static within local wrapper scopes to prevent linker naming collisions."),
+
+    # Topic 2: Data Types & Variables
+    (2, "Easy", "Appropriate type selection", 
+     "A student needs to store a sensor reading representing a percentage value from 0 to 100. They want to minimize memory usage.", 
+     "Which data type is the most efficient choice?", 
+     "A", 
+     "A 'byte' (unsigned 8-bit integer) can store values from 0 to 255. It uses only 1 byte of RAM, making it the most memory-efficient option for values under 256."),
+    
+    (2, "Medium", "Character array allocation", 
+     "A developer declares a character array to store the word 'HELLO': 'char msg[5] = \"HELLO\";'. The compiler throws an error.", 
+     "What is the cause of the compilation error?", 
+     "B", 
+     "A C-style string needs a null terminator ('\\0') at the end. To store 5 characters, the array size must be at least 6 bytes (e.g., char msg[6] = \"HELLO\";)."),
+    
+    (2, "Medium", "Unsigned subtraction rollover", 
+     "An automated irrigation timer stores the system time in an unsigned 16-bit integer (unsigned int). A calculation is set up: 'unsigned int delayPeriod = timeA - timeB;'. During execution, timeA is 10 and timeB is 20.", 
+     "What is the resulting value of delayPeriod?", 
+     "C", 
+     "Due to unsigned arithmetic, subtracting 20 from 10 wraps around: 10 - 20 = -10, which rolls over to 65526 (65536 - 10) in 16-bit unsigned space."),
+    
+    (2, "Medium", "Heap fragmentation failure", 
+     "A data logger sketch on an Arduino Uno reads temperature data every second. It appends the value to a String object: 'dataString += String(temp) + \",\";'. After running for 12 hours, the program halts.", 
+     "What is the most likely cause of this failure?", 
+     "B", 
+     "Repeated String concatenation dynamically reallocates heap memory. Over time, this fragments the limited 2KB RAM of the Uno, leading to allocation failures that crash the system."),
+    
+    (2, "Hard", "Volatile cache mismatch", 
+     "A programmer writes an ISR that increments a counter: 'void pinISR() { isrCount++; }'. In the main loop, they check 'if (isrCount == 10) { ... }'. The ISR runs, but the main loop never detects isrCount reaching 10.", 
+     "What variable declaration fix will resolve this issue?", 
+     "B", 
+     "The variable 'isrCount' must be declared with the 'volatile' qualifier. This forces the compiler to read its value from RAM rather than caching it in a CPU register."),
+    
+    (2, "Hard", "Float precision accumulation", 
+     "A calculation loop adds 0.1 to a floating-point accumulator variable 100 times: 'for (int i=0; i<100; i++) sum += 0.1;'. Later, the code checks 'if (sum == 10.0)', but this condition evaluates to false.", 
+     "Why does this comparison fail?", 
+     "B", 
+     "Floating-point numbers are represented in binary with finite precision. Adding 0.1 repeatedly accumulates rounding errors, making the final value slightly different from exactly 10.0."),
+
+    # Topic 3: Digital & Analog I/O
+    (3, "Easy", "Floating pin noise", 
+     "A student connects a push button to pin 2. The other terminal is connected to 5V. They configure the pin using 'pinMode(2, INPUT)'. In the loop, digitalRead(2) returns random HIGH/LOW states when the button is open.", 
+     "What hardware or software fix will stabilize the readings?", 
+     "A", 
+     "When open, pin 2 is floating and susceptible to noise. The pin needs a pull-down resistor to GND, or should be configured as INPUT_PULLUP with the button connected to GND."),
+    
+    (3, "Easy", "PWM Pin selection", 
+     "A developer wants to dim an LED using analogWrite(pin, brightness) on an Arduino Uno. They connect the LED to digital pin 4.", 
+     "Why does the LED turn fully ON or OFF rather than dimming?", 
+     "B", 
+     "Pin 4 on the Arduino Uno is not a hardware PWM pin. Calling analogWrite() on non-PWM pins causes them to output 0V (for values < 128) or 5V (for values >= 128)."),
+    
+    (3, "Medium", "ADC Voltage scaling", 
+     "An analog sensor is connected to pin A0 on a 5V Arduino Uno. The analogRead(A0) function returns a stable value of 205.", 
+     "What is the corresponding measured sensor voltage?", 
+     "B", 
+     "The ADC value scales as: Voltage = (ADC Value * 5.0) / 1023. Thus, (205 * 5.0) / 1023 = 1.0V."),
+    
+    (3, "Medium", "Internal pullup current limit", 
+     "A developer connects a high-power sensor that draws 15mA to an input pin configured as INPUT_PULLUP. The sensor output voltage drops, and the board cannot read it properly.", 
+     "What is the source of this problem?", 
+     "B", 
+     "Internal pull-ups have high resistance (20k-50k ohms), providing very low current (~0.1mA). A sensor requiring 15mA cannot be powered through pull-ups; it needs an external low-resistance pull-up or dedicated power."),
+    
+    (3, "Medium", "Direct port register write", 
+     "A developer needs to toggle digital pins 2, 3, 4, and 5 simultaneously within a single clock cycle to drive a parallel DAC.", 
+     "Which programming method should they use?", 
+     "B", 
+     "Direct port manipulation (e.g., PORTD) changes the state of multiple pins on the same port in a single clock cycle, bypassing the slower pin-by-pin digitalWrite() checks."),
+    
+    (3, "Hard", "External reference short circuit", 
+     "A researcher connects an external precision 3.3V reference source to the AREF pin of a 5V Arduino Uno. In the code, they call analogRead(A0) before configuring the reference.", 
+     "What is the risk of this sequence?", 
+     "B", 
+     "By default, the internal 5V reference is active. Running analogRead() connects the internal 5V reference to the AREF pin, shorting the 5V rail to the 3.3V source and damaging the ADC multiplexer."),
+
+    # Topic 4: Time & Timing (6 Questions)
+    (4, "Easy", "Blocking delays unresponsiveness", 
+     "A student writes a sketch that reads a temperature sensor and prints it, followed by a 'delay(5000);' call. They add a push button on pin 2 to trigger a warning LED, but notice the button is unresponsive.", 
+     "Why does the button press feel unresponsive?", 
+     "B", 
+     "During the 5-second delay(), the CPU is blocked. Button presses on pin 2 are ignored unless the button happens to be held down at the exact instant the delay ends."),
+    
+    (4, "Easy", "Unsigned long data type choice", 
+     "A programmer tracks elapsed time using a standard 'int' variable: 'int lastTime = millis();'. After running for 33 seconds, the timing checks fail.", 
+     "What caused the failure?", 
+     "B", 
+     "An 'int' is signed 16-bit, holding values up to 32,767. After 32.7 seconds (32,767 ms), the value overflows into negative numbers, breaking comparison logic. The variable must be declared as 'unsigned long'."),
+    
+    (4, "Medium", "Non-blocking interval execution", 
+     "A programmer needs to read a sensor every 250 milliseconds while keeping a serial control interface responsive to incoming user commands at any time.", 
+     "How should they implement this timing logic?", 
+     "B", 
+     "They should check 'if (millis() - lastRead >= 250)' in the loop(), updating 'lastRead = millis()' inside the condition. This avoids blocking delays and keeps loop() running."),
+    
+    (4, "Medium", "Interval shift tracking", 
+     "A timing loop is configured as: 'if (millis() - lastTime >= 1000) { lastTime = millis(); doWork(); }'. The developer notices that over time, the execution intervals drift slightly, occurring slightly slower than once per second.", 
+     "How can they fix this accumulation drift?", 
+     "B", 
+     "Updating 'lastTime += 1000' instead of 'lastTime = millis()' ensures that the interval remains anchored to the target grid, preventing execution drift caused by execution delays."),
+    
+    (4, "Medium", "ISR timer delay freeze", 
+     "A developer attaches an interrupt to pin 2 to handle an emergency stop button. Inside the ISR, they write 'digitalWrite(13, HIGH); delay(100); digitalWrite(13, LOW);' to flash an indicator.", 
+     "What will happen when the interrupt triggers?", 
+     "C", 
+     "The board will hang indefinitely. delay() relies on Timer 0 interrupts to increment system time. Since interrupts are disabled inside an ISR, the timer never increments and the delay loop runs forever."),
+    
+    (4, "Hard", "microsecond overflow rollover limit", 
+     "A high-frequency sensor reader tracks timing in microseconds using 'micros()'. The code needs to run continuously for several hours.", 
+     "After what duration will the micros() value roll over, and how does it affect comparison calculations?", 
+     "C", 
+     "micros() rolls over after ~71.5 minutes (2^32 microseconds). Using unsigned subtraction (currentTime - lastTime) handles this wrap-around correctly, preventing timing errors after the rollover."),
+
+    # Topic 5: Serial Communication (6 Questions)
+    (5, "Easy", "Serial Baud mismatch garbage", 
+     "A student initializes Serial.begin(9600) in setup(). They open the serial monitor, but see random symbols and gibberish characters instead of the text they printed.", 
+     "What is the most likely cause of this issue?", 
+     "B", 
+     "The serial monitor's baud rate is set to a value other than 9600. The mismatched timing causes the computer to decode the serial signal incorrectly, producing garbled characters."),
+    
+    (5, "Easy", "Serial print vs write characters", 
+     "A developer calls 'Serial.print(65);' in one loop iteration and 'Serial.write(65);' in the next.", 
+     "What is displayed in the serial monitor?", 
+     "B", 
+     "Serial.print(65) sends the ASCII characters '6' and '5', displaying '65'. Serial.write(65) sends the raw byte value 65, which corresponds to the ASCII character 'A'."),
+    
+    (5, "Medium", "Buffer overflow data loss", 
+     "A sensor system sends 100 bytes of data in a rapid burst to an Arduino Uno every 500ms. In the sketch, loop() processes serial data slowly, reading only 1 byte per iteration.", 
+     "What will happen to the received data?", 
+     "B", 
+     "The serial receive buffer is 64 bytes. The rapid 100-byte burst will overflow the buffer, and the remaining 36 bytes will be discarded. The sketch will only read the first 64 bytes."),
+    
+    (5, "Medium", "Serial available non blocking check", 
+     "A programmer writes 'if (Serial.read() == 'S')' without checking Serial.available(). They notice that the code executes logic even when no data has been sent.", 
+     "Why does this occur?", 
+     "B", 
+     "If the serial buffer is empty, Serial.read() returns -1. The check should verify that data is available first: 'if (Serial.available() > 0 && Serial.read() == 'S')'."),
+    
+    (5, "Medium", "Native USB serial connection lock", 
+     "A developer uploads a sketch to an Arduino Leonardo. The sketch prints output immediately in setup(). However, the first few lines of output are always missing from the serial monitor when the board powers up.", 
+     "How should they modify setup() to fix this?", 
+     "B", 
+     "They should add 'while (!Serial);' after Serial.begin(). On boards with native USB CDC, this loops until the USB serial port is opened by the computer, preventing data from being sent before the monitor is ready."),
+    
+    (5, "Hard", "SoftwareSerial high speed corruption", 
+     "A developer configures a SoftwareSerial instance on pins 2 and 3 to communicate with a GPS module at 115200 baud. They find that the received data is frequently corrupted.", 
+     "What is the best way to address this problem?", 
+     "B", 
+     "SoftwareSerial relies on software timing loops that struggle to handle high speeds. The baud rate of the GPS module should be configured to 9600 or 19200 baud, or the device should be connected to a hardware UART pin."),
+
+    # Topic 6: I2C & SPI Protocols (6 Questions)
+    (6, "Easy", "I2C SDA SCL swapped pins", 
+     "A student connects an I2C sensor to an Arduino Uno but accidentally connects the sensor's SDA pin to pin A5 and the SCL pin to pin A4.", 
+     "What will happen when the sketch runs?", 
+     "B", 
+     "The communication will fail. SDA must connect to A4 and SCL to A5. Reversing the pins prevents the clock and data signals from aligning, preventing any data transfer."),
+    
+    (6, "Easy", "SPI Chip Select missing connection", 
+     "An engineer wires an SPI flash chip to MOSI, MISO, and SCK pins, but leaves the Chip Select (CS) pin disconnected, tying it directly to VCC.", 
+     "Why does the Arduino fail to read or write to the flash chip?", 
+     "C", 
+     "SPI slave devices are only active when their Chip Select (CS) line is pulled LOW. Keeping CS high disables the chip's SPI interface, ignoring all clock and data signals."),
+    
+    (6, "Medium", "I2C missing pullup resistors", 
+     "A custom PCB is designed with five I2C sensors connected to an Arduino. The developer notices that the I2C bus hangs during initialization, failing to communicate with any sensor.", 
+     "What hardware check is most critical to perform?", 
+     "B", 
+     "Verify that pull-up resistors are installed on the SDA and SCL lines. Since I2C uses open-drain drivers, pull-ups are required to pull the lines high; without them, the bus stays low, halting communication."),
+    
+    (6, "Medium", "I2C address collision conflict", 
+     "A developer connects two identical I2C temperature sensors to the same Wire bus. The sketch only reads data from one sensor, and the readings fluctuate erratically.", 
+     "What is the cause of this conflict?", 
+     "B", 
+     "Since the sensors are identical, they share the same I2C address. When the master sends a request, both slaves respond at the same time, colliding on the SDA line. One sensor must be configured with a different address."),
+    
+    (6, "Medium", "SPI bus speed clock settings", 
+     "A sketch uses two SPI devices: a high-speed SD card (running at 8 MHz) and a slow sensor (supporting up to 1 MHz). The SPI bus runs at 8 MHz, and the sensor returns corrupted data.", 
+     "How should the developer resolve this issue?", 
+     "B", 
+     "Use 'SPISettings' to configure the bus speed before each transfer. This dynamic configuration ensures the bus runs at 8 MHz for the SD card and 1 MHz for the sensor."),
+    
+    (6, "Hard", "I2C Bus recovery lockup", 
+     "An industrial monitor experiences occasional I2C bus hangs, locking up the controller. The developer discovers that a slave device was reset mid-transmission, holding the SDA line LOW.", 
+     "How can the code recover from this stuck bus state?", 
+     "B", 
+     "The master must configure the SCL pin as a digital output and toggle it up to 9 times (generating clock pulses) to force the slave to release the SDA line, then call Wire.begin() to reinitialize."),
+
+    # Topic 7: External Interrupts (6 Questions)
+    (7, "Easy", "Incorrect pin mapping Uno", 
+     "A student configures an interrupt using 'attachInterrupt(4, alarmISR, RISING);' on an Arduino Uno, expecting digital pin 4 to trigger the alarm.", 
+     "Why does the alarm ISR never trigger when pin 4 goes high?", 
+     "B", 
+     "Uno pins are not mapped 1-to-1 to interrupt numbers. Pin 4 does not support external interrupts on the Uno. The code should use pin 2 or 3, wrapping it with `digitalPinToInterrupt(pin)`."),
+    
+    (7, "Easy", "ISR missing void parameter", 
+     "A programmer defines an ISR: 'int buttonISR(int pin) { ... }' and attempts to compile. The compiler rejects the code.", 
+     "How must the ISR be redefined to fix this compile error?", 
+     "B", 
+     "An ISR must be declared as returning void and accepting no arguments: `void buttonISR() { ... }`."),
+    
+    (7, "Medium", "Volatile optimization missing state", 
+     "A state variable 'motorActive' is toggled inside an ISR: 'void stopISR() { motorActive = false; }'. In the main loop, 'while (motorActive) { runMotor(); }' never exits, even after the ISR triggers.", 
+     "What variable declaration fix will resolve this issue?", 
+     "B", 
+     "Declare 'motorActive' as 'volatile bool motorActive = true;'. This prevents the compiler from caching the variable in a CPU register, forcing the loop to read its updated state from RAM."),
+    
+    (7, "Medium", "Switch bouncing multiple triggers", 
+     "A mechanical switch is connected to interrupt pin 2. When the user presses the button once, the interrupt handler executes five times in rapid succession.", 
+     "What is the cause of this behavior, and how should it be fixed?", 
+     "B", 
+     "Mechanical switch contacts bounce, creating multiple electrical transitions. The ISR should compare the current timestamp with the last trigger time, ignoring triggers that occur too quickly (debouncing)."),
+    
+    (7, "Medium", "Non-Atomic read corruption", 
+     "A wind gauge uses an interrupt to increment a 32-bit count variable: 'volatile unsigned long ticks; void countISR() { ticks++; }'. The main loop reads 'ticks' to calculate wind speed, occasionally getting corrupted values.", 
+     "Why does this corruption occur, and how should it be fixed?", 
+     "B", 
+     "An 8-bit AVR processor requires multiple instructions to read a 32-bit value. If the ISR triggers mid-read, the variable will contain mixed bytes. The read should be protected by a temporary noInterrupts() block."),
+    
+    (7, "Hard", "Watchdog timer crash loop", 
+     "A developer enables the watchdog timer with a 15ms timeout. An ISR takes 20ms to execute because it performs float calculations. The board resets continuously in a loop.", 
+     "What is the cause, and how should it be addressed?", 
+     "B", 
+     "The long ISR duration prevents the watchdog from being cleared, triggering a reset. The ISR should be kept minimal (e.g., setting a flag), shifting the calculations to the main loop."),
+
+    # Topic 8: Standard Libraries (6 Questions)
+    (8, "Easy", "Servo power jitter", 
+     "A student connects a high-torque servo motor directly to the 5V pin of an Arduino Uno. When the servo moves, the Arduino resets repeatedly.", 
+     "What is the cause of this behavior?", 
+     "B", 
+     "The servo draws more current than the Uno's 5V regulator can supply, causing a voltage drop (brownout) that triggers the microcontroller's reset circuit. The servo needs a separate power supply."),
+    
+    (8, "Easy", "SD card write format fail", 
+     "A user copies data logging files to an SD card formatted in NTFS. When they insert the card into the shield, the SD.begin() call fails.", 
+     "How should they resolve this issue?", 
+     "B", 
+     "The standard SD library only supports FAT16 and FAT32 file systems. The card must be formatted to FAT32 to initialize successfully."),
+    
+    (8, "Medium", "LCD clear loop flicker", 
+     "A programmer writes 'lcd.clear(); lcd.print(sensorValue); delay(10);' inside the loop(). The display flickers heavily, making it difficult to read.", 
+     "How should they modify the code to reduce flicker?", 
+     "B", 
+     "Avoid calling lcd.clear() in rapid loops. Instead, use lcd.setCursor() to overwrite changed digits, or add trailing spaces to clear remaining characters."),
+    
+    (8, "Medium", "SD file write data loss", 
+     "A temperature logging station writes data to a file: 'myFile.println(temp);' every 5 seconds. When the power is disconnected, the developer finds the log file empty.", 
+     "What is the cause of this data loss?", 
+     "B", 
+     "Writes are buffered in RAM to minimize SD card wearing. The data is only saved to the card when File.close() or File.flush() is called. The sketch should call flush() after each write."),
+    
+    (8, "Medium", "Servo PWM conflict pin 9/10", 
+     "A robotic arm uses a Servo object on pin 9 and a motor controller driven by analogWrite() on pin 10. The motor speed on pin 10 behaves erratically.", 
+     "What is the cause of this conflict?", 
+     "B", 
+     "The Servo library uses Timer 1 on the Uno. This disables PWM capability on pins 9 and 10, which rely on Timer 1. The motor controller must be moved to a PWM pin driven by a different timer (e.g., pin 3, 5, or 6)."),
+    
+    (8, "Hard", "SPI SD Chip Select conflict", 
+     "A sketch uses both an SD card and an SPI display. The SD card works fine, but the display shows garbage data whenever the SD card is accessed.", 
+     "What is the most likely cause of this SPI conflict?", 
+     "B", 
+     "Both devices are sharing the SPI bus, but their Chip Select (CS) pins are not being managed correctly. The code must pull the target device's CS pin LOW and ensure the other CS pin is pulled HIGH during communication."),
+
+    # Topic 9: MicroPython on Arduino (6 Questions)
+    (9, "Easy", "MicroPython syntax error", 
+     "A developer writes C++ syntax 'pinMode(2, OUTPUT);' in a MicroPython script. The interpreter returns a NameError.", 
+     "What is the correct way to configure a pin as an output in MicroPython?", 
+     "B", 
+     "MicroPython uses the machine module. Pins are configured using the Pin constructor: `from machine import Pin; led = Pin(2, Pin.OUT)`."),
+    
+    (9, "Easy", "MicroPython import error", 
+     "A user attempts to run a MicroPython script containing 'import machine', but receives an ImportError on their computer.", 
+     "Why did the import fail?", 
+     "B", 
+     "The machine module is part of the MicroPython firmware running on the board. The script must be uploaded and run on the board itself, not executed on the computer's standard Python interpreter."),
+    
+    (9, "Medium", "MicroPython float division behavior", 
+     "A MicroPython script divides two integers: 'value = 5 / 2'. The developer expects value to be 2 (integer division) as in C++.", 
+     "What is the resulting value of 'value' in MicroPython?", 
+     "B", 
+     "In Python 3 (and MicroPython), the single slash (/) operator performs floating-point division, returning 2.5. Integer division is performed using double slashes (//)."),
+    
+    (9, "Medium", "MicroPython ADC 16bit scaling", 
+     "A developer reads an analog sensor using a 10-bit ADC in MicroPython: 'val = adc.read_u16()'. They expect a value from 0 to 1023, but get a value around 32768.", 
+     "Why is the returned value much higher than expected?", 
+     "B", 
+     "The read_u16() method scales the raw ADC reading to a 16-bit range (0 to 65535) for consistency across different microcontroller architectures, returning 32768 for half-scale voltage."),
+    
+    (9, "Medium", "MicroPython ISR RuntimeError", 
+     "A MicroPython script configures an interrupt handler: 'pin.irq(handler=buttonISR)'. The buttonISR function formats a string: 'print(\"Button pressed at %d\" % time.ticks_ms())'. Pressing the button causes the script to crash.", 
+     "What is the cause of this crash?", 
+     "B", 
+     "MicroPython ISRs cannot allocate memory on the heap. String formatting and printing allocate memory, throwing a RuntimeError. The ISR should simply set a flag variable."),
+    
+    (9, "Hard", "MicroPython garbage collection delay", 
+     "A MicroPython script processes sensor data inside a loop, occasionally stuttering or lagging for a few milliseconds.", 
+     "What is the most likely cause, and how can it be resolved?", 
+     "B", 
+     "The automatic garbage collector (GC) is running, pausing execution to reclaim memory. The developer should call gc.collect() manually at controlled intervals (e.g., at the end of the loop) to prevent automatic pauses."),
+
+    # Topic 10: Arduino IoT Cloud & API (6 Questions)
+    (10, "Easy", "IoT Cloud offline variables", 
+     "A developer defines a cloud variable 'sensorTemp' in the IoT Cloud. They modify the value in their code: 'sensorTemp = 25.0;'. However, the dashboard widget does not update.", 
+     "What is the most likely cause?", 
+     "B", 
+     "The board is not connected to the internet, or the sketch is not calling 'ArduinoCloud.update()' in the loop() function to synchronize variables with the cloud."),
+    
+    (10, "Easy", "IoT Cloud widget setup", 
+     "A user creates an IoT Cloud dashboard with a Switch widget to control a relay. They find that toggling the switch has no effect on the relay.", 
+     "What step did they miss during configuration?", 
+     "B", 
+     "The Switch widget must be linked to a Read/Write cloud variable, and a callback function (e.g., onRelayChange) must be implemented in the sketch to toggle the relay pin."),
+    
+    (10, "Medium", "Cloud update blocking loop", 
+     "A developer writes a loop() function that contains 'delay(5000);' and 'ArduinoCloud.update();'. They notice that variable updates are delayed and the connection drops occasionally.", 
+     "How should they address this issue?", 
+     "B", 
+     "The 5-second delay block prevents ArduinoCloud.update() from running frequently enough. The sketch should use non-blocking timing with millis() to keep loop() running smoothly."),
+    
+    (10, "Medium", "On Change sync rate limit", 
+     "A high-frequency sensor updates a cloud variable 50 times per second using the 'On Change' sync policy. The board gets disconnected from the cloud due to rate limiting.", 
+     "How should the sync configuration be modified?", 
+     "B", 
+     "Sending 50 updates/sec exceeds bandwidth limits. The variable's sync policy should be changed to 'Periodic' (e.g., every 5 seconds), or the sketch should rate-limit updates in code."),
+    
+    (10, "Medium", "IoT Cloud crypto chip authentication", 
+     "A developer tries to run the Arduino IoT Cloud library on a generic ESP32 board without an external crypto chip. The sketch compiles, but fails to connect during SSL handshake.", 
+     "What configuration step is required for authentication?", 
+     "B", 
+     "Since the board lacks a hardware crypto chip, the developer must configure the client to use software-based SSL certificates for authentication, providing the credentials in the sketch."),
+    
+    (10, "Hard", "IoT Cloud Webhooks POST format", 
+     "An IoT system needs to send a Slack alert when a cloud variable 'tempAlert' becomes true. The developer sets up a Webhook in the IoT Cloud.", 
+     "What payload does the Webhook send to the target URL?", 
+     "B", 
+     "The Webhook sends an HTTP POST request containing a JSON payload with details about the variable, its new value, the Thing ID, and a timestamp.")
+]
+
+# 60 Short Answers
+# Format: (topic_id, "Difficulty", "Objective", "Question", "ExpectedAnswer")
+shorts_raw = [
+    # Topic 1: Sketch Structure & Control Flow
+    (1, "Easy", "Setup function purpose", "Explain the primary purpose of the setup() function in an Arduino sketch.", "It is used to initialize variables, configure pin modes (INPUT/OUTPUT), start library services, and run initialization code once upon startup or reset."),
+    (1, "Medium", "Loop function purpose", "Explain the function of the loop() block in an Arduino sketch.", "The loop() function runs continuously and repeatedly, housing the main logic, sensor readings, and output controls of the application."),
+    (1, "Medium", "Break statement function", "Describe the role of the 'break' keyword inside a loop structure.", "It terminates the loop immediately, passing control to the statement directly following the loop."),
+    (1, "Medium", "Local vs Global scope", "What is the difference in accessibility between local and global variables?", "Global variables are declared outside functions and are accessible anywhere in the sketch. Local variables are declared inside a function and are only accessible within that function."),
+    (1, "Hard", "Volatile keyword function", "Why is the 'volatile' keyword necessary for variables shared between an ISR and the main loop?", "It prevents the compiler from optimizing variable access by caching it in registers, forcing the CPU to read the variable directly from RAM each time it is accessed."),
+    (1, "Hard", "Recursion memory risks", "Why should recursive functions be avoided in resource-constrained microcontrollers like the Arduino Uno?", "Each recursive call consumes stack space in SRAM. With limited RAM, deep recursion can cause a stack overflow, corrupting memory and crashing the board."),
+
+    # Topic 2: Data Types & Variables
+    (2, "Easy", "Float vs Int memory", "Contrast float and int data types in terms of decimal representation and precision.", "An int stores only whole numbers (integers), while a float stores decimal values (floating-point numbers) with fractional parts."),
+    (2, "Medium", "Byte memory size", "What is the range of values that can be stored in a single 'byte' data type?", "A byte is an unsigned 8-bit integer that can store values from 0 to 255."),
+    (2, "Medium", "Unsigned int advantages", "When is it advantageous to declare a variable as 'unsigned int' instead of 'int'?", "When you only need to store non-negative values and require a larger positive range (up to 65,535 instead of 32,767 on AVR boards)."),
+    (2, "Medium", "String heap fragmentation", "Explain how using the C++ 'String' class can lead to heap fragmentation in microcontrollers.", "The String class dynamically allocates and deallocates memory on the heap. Frequent modifications create gaps in memory, eventually leading to allocation failures due to lack of contiguous free space."),
+    (2, "Hard", "Float comparison epsilon", "Why is comparing two float values directly using '==' unsafe, and what is the proper method?", "Floating-point numbers are stored with binary approximations and can contain small rounding errors. Instead of direct equality, check if the absolute difference is smaller than a small threshold (epsilon)."),
+    (2, "Hard", "Static variable persistence", "How does declaring a local variable as 'static' alter its behavior?", "It ensures the variable is initialized only once and retains its value between successive function calls, rather than being destroyed and recreated."),
+
+    # Topic 3: Digital & Analog I/O
+    (3, "Easy", "pinMode configuration", "What does calling 'pinMode(7, INPUT_PULLUP)' do electrically to digital pin 7?", "It configures pin 7 as a digital input and activates its internal pull-up resistor, keeping the input state HIGH by default when disconnected."),
+    (3, "Easy", "digitalWrite definition", "What is the output voltage on a digital pin when 'digitalWrite(pin, HIGH)' is called on a 5V Arduino board?", "The pin outputs a steady 5V voltage."),
+    (3, "Medium", "analogRead scaling", "Explain the relationship between the input voltage and the integer value returned by analogRead() on a 5V board.", "The 10-bit ADC scales the input voltage linearly from 0V to 5V into an integer from 0 to 1023 (e.g., 0V yields 0, 2.5V yields 512, and 5V yields 1023)."),
+    (3, "Medium", "analogWrite PWM duty cycle", "Describe the signal output when 'analogWrite(pin, 127)' is called on a PWM pin.", "It generates a square wave PWM signal with a 50% duty cycle, switching between 0V and VCC (5V/3.3V) in equal intervals."),
+    (3, "Medium", "Port manipulation speed", "Explain the speed advantage of using direct port manipulation (like PORTD) over digitalWrite().", "Port manipulation writes directly to the microcontroller's registers in a single instruction cycle, bypassing the slower pin-by-pin lookup and safety checks of digitalWrite()."),
+    (3, "Hard", "AREF safety warning", "What safety precaution must be taken when using an external reference voltage on the AREF pin?", "You must call 'analogReference(EXTERNAL)' in code before using analogRead() to prevent shorting the internal reference voltage to the external source, which can damage the ADC."),
+
+    # Topic 4: Time & Timing
+    (4, "Easy", "delay blocking limitation", "Why is the use of 'delay()' discouraged in complex sketches?", "Because delay() is a blocking function that halts all CPU processing during the pause, making the system unresponsive to inputs like button presses or sensor events."),
+    (4, "Easy", "millis time unit", "What time unit is returned by the millis() function, and when does it start counting?", "It returns the elapsed time in milliseconds (1/1000th of a second) since the Arduino board was powered up or reset."),
+    (4, "Medium", "millis subtraction logic", "Why does the expression 'millis() - previousTime >= interval' work correctly even during a millis() overflow?", "Because unsigned integer arithmetic wraps around during overflow, ensuring the calculated difference is correct even if millis() has rolled back to zero."),
+    (4, "Medium", "millis vs micros resolution", "Compare the resolution and rollover period of millis() and micros().", "millis() has a 1ms resolution and rolls over in ~49.7 days. micros() has a 4us resolution (on 16MHz boards) and rolls over in ~71.5 minutes."),
+    (4, "Medium", "ISR delay hang", "Explain why calling 'delay()' inside an ISR causes the microcontroller to hang.", "Inside an ISR, interrupts are disabled. Since delay() relies on Timer 0 overflow interrupts to increment system time, the counter never advances and the delay loops indefinitely."),
+    (4, "Hard", "Timer 0 prescaler change", "What system timing side-effects occur if you modify the prescaler of Timer 0?", "Since Timer 0 is used for system timekeeping, changing its prescaler will speed up or slow down the timing of millis(), micros(), and delay()."),
+
+    # Topic 5: Serial Communication
+    (5, "Easy", "Baud rate definition", "What is the meaning of the baud rate parameter passed to Serial.begin(baud)?", "It specifies the transmission speed of serial data in bits per second, which must match the receiver's rate to ensure correct decoding."),
+    (5, "Easy", "Serial available check", "What is the purpose of checking 'Serial.available()' before calling 'Serial.read()'?", "It checks if there is any data in the serial receive buffer, preventing Serial.read() from returning -1 (indicating no data)."),
+    (5, "Medium", "ASCII vs binary serialization", "What is the difference between Serial.print('A') and Serial.write(65)?", "Serial.print('A') converts the character to its ASCII string, while Serial.write(65) sends the raw byte value 65 directly (which is the ASCII code for 'A')."),
+    (5, "Medium", "Serial buffer overflow limits", "What happens to incoming serial data when the internal receive buffer is full?", "The receive buffer has a default size of 64 bytes. Once full, any new incoming bytes are discarded until data is read out."),
+    (5, "Medium", "SoftwareSerial processing costs", "Why does the SoftwareSerial library struggle to maintain reliable communication at high baud rates?", "Because it uses software pin-change interrupts and precise delay loops to timing-decode serial bits, which consumes significant CPU cycles and is easily disrupted at high speeds."),
+    (5, "Hard", "while(!Serial) CDC lock", "Why is the 'while (!Serial)' line used in the setup() of boards like Leonardo or Micro?", "On boards with native USB, it pauses program execution until the USB CDC virtual serial connection is opened by the computer, preventing early output data loss."),
+
+    # Topic 6: I2C & SPI Protocols
+    (6, "Easy", "I2C bus wires", "What are the two signal lines used by I2C, and what are their roles?", "SDA (Serial Data) carries the data payload, and SCL (Serial Clock) carries the clock signal that synchronizes data transfer."),
+    (6, "Easy", "SPI bus lines", "List the four primary signals used in the SPI protocol.", "MOSI (Master Out Slave In), MISO (Master In Slave Out), SCK (Serial Clock), and SS/CS (Slave Select/Chip Select)."),
+    (6, "Medium", "I2C pullup requirements", "Why are pull-up resistors required on the SDA and SCL lines in I2C?", "I2C uses open-drain drivers, meaning devices can only pull the lines LOW. Pull-up resistors are needed to pull the lines back to a HIGH state when idle."),
+    (6, "Medium", "SPI slave selection CS", "Explain how the Chip Select (CS) line is used to communicate with a specific device on a shared SPI bus.", "The master pulls the target device's CS line LOW to activate its SPI interface, keeping all other CS lines HIGH to prevent bus contention."),
+    (6, "Medium", "Wire.endTransmission status codes", "What are the return codes of Wire.endTransmission() and what do they indicate?", "0 indicates success, 1 indicates data too long, 2 indicates NACK on address, 3 indicates NACK on data, and 4 indicates other bus errors."),
+    (6, "Hard", "SPI settings synchronization", "Why is it important to use 'SPISettings' in modern multi-device SPI applications?", "It configures the SPI bus parameters (speed, bit order, data mode) dynamically before communicating with each device, preventing clock conflicts when different speed devices share the bus."),
+
+    # Topic 7: External Interrupts
+    (7, "Easy", "Interrupt pin limitations Uno", "Which digital pins on the Arduino Uno can be configured for external interrupts?", "Only digital pins 2 (Interrupt 0) and 3 (Interrupt 1)."),
+    (7, "Easy", "ISR declaration constraints", "What are the restrictions on the return type and parameters of an ISR function?", "An ISR must return void and cannot accept any parameters (it must be parameterless)."),
+    (7, "Medium", "Volatile cache explanation", "Explain why global variables modified inside an ISR must be declared as volatile.", "It tells the compiler that the variable can change unpredictably, forcing the CPU to fetch its value from RAM rather than caching it in a register."),
+    (7, "Medium", "Interrupt CHANGE mode", "Describe when the 'CHANGE' interrupt trigger mode will execute.", "It triggers the ISR whenever the input pin transitions in either direction (from HIGH to LOW or from LOW to HIGH)."),
+    (7, "Medium", "ISR debouncing technique", "How can you debounce a mechanical button inside an ISR without using delay()?", "By checking the current timestamp (using millis() or micros()) and ignoring triggers that occur within a small debounce window (e.g., 50ms) of the last valid event."),
+    (7, "Hard", "AVR nested interrupts default", "Why are nested interrupts disabled by default on AVR-based Arduinos?", "Because the processor automatically clears the global interrupt enable bit in the Status Register upon entering an ISR, disabling other interrupts until the ISR exits."),
+
+    # Topic 8: Standard Libraries
+    (8, "Easy", "Servo pin write angle", "How does the Servo library's write() function control a standard servo motor?", "It accepts an angle from 0 to 180 degrees and translates it into a PWM pulse width (typically 1ms to 2ms) to position the servo shaft."),
+    (8, "Easy", "SD filesystem requirements", "What filesystem format is required for an SD card to be read by the standard SD library?", "The card must be formatted to FAT16 or FAT32 file systems; NTFS or exFAT are not supported."),
+    (8, "Medium", "SD file write data loss risk", "What is the purpose of calling 'myFile.flush()' or 'myFile.close()' in SD card operations?", "It forces any cached data in RAM to be written to the physical SD card, preventing data loss if the system loses power."),
+    (8, "Medium", "LCD 4-bit vs 8-bit connection", "What is the primary advantage of driving a character LCD in 4-bit mode?", "It reduces the number of digital I/O pins required on the Arduino from 10 (in 8-bit mode) to 6, saving pins for other peripherals."),
+    (8, "Medium", "Servo library Timer 1 conflict", "Why does using the Servo library on the Arduino Uno disable PWM on pins 9 and 10?", "Because the Servo library uses Timer 1 to generate pulses, which overrides the hardware PWM generation on pins 9 and 10 which rely on Timer 1."),
+    (8, "Hard", "SD card SPI SS input trap", "Why must the hardware SS pin (pin 10 on Uno) be set as an OUTPUT even if we use pin 4 as SD card Chip Select?", "If the hardware SS pin is configured as an input and pulled LOW, the SPI interface will switch from Master to Slave mode, breaking communication with the SD card."),
+
+    # Topic 9: MicroPython on Arduino
+    (9, "Easy", "MicroPython hardware module", "Which standard module in MicroPython is used to interface with hardware peripherals?", "The 'machine' module (which contains Pin, ADC, PWM, I2C, and SPI classes)."),
+    (9, "Easy", "REPL definition MicroPython", "What is the MicroPython REPL and how is it accessed?", "REPL stands for Read-Eval-Print Loop. It is an interactive prompt accessed over serial that allows running Python commands directly on the board."),
+    (9, "Medium", "MicroPython ADC normalization", "What is the default bit resolution returned by 'adc.read_u16()' in MicroPython?", "It normalizes all readings to a 16-bit range, returning values from 0 to 65,535 regardless of the underlying ADC hardware resolution."),
+    (9, "Medium", "MicroPython dynamic typing vs C++", "Contrast variable typing in MicroPython with C++.", "C++ is statically typed (variables must have declared types like int, float), while MicroPython is dynamically typed (types are inferred at runtime)."),
+    (9, "Medium", "MicroPython ISR RuntimeError", "Why will a MicroPython script crash if its ISR attempts to allocate memory?", "Because heap allocation is disabled during interrupts to prevent memory corruption. Allocating memory in an ISR raises a RuntimeError, halting the script."),
+    (9, "Hard", "MicroPython REPL interactivity", "What is the MicroPython REPL and how does it facilitate testing?", "REPL stands for Read-Eval-Print Loop. It is an interactive prompt accessed over serial that allows running Python commands directly on the board."),
+
+    # Topic 10: Arduino IoT Cloud & API
+    (10, "Easy", "IoT Cloud dashboard widgets", "What is the function of dashboard widgets in the Arduino IoT Cloud?", "They provide a graphical user interface (such as gauges, switches, and charts) to monitor and control cloud variables in real time."),
+    (10, "Easy", "IoT Cloud variables synchronization", "Explain why internet connectivity is required for Arduino IoT Cloud variables synchronization.", "Internet connectivity (Wi-Fi, Cellular, etc.) is required for the library to sync variable states with the cloud."),
+    (10, "Medium", "IoT Cloud loop requirement", "Why must the ArduinoCloud.update() function be called frequently in the loop() function?", "It handles background tasks, synchronizes variables, and maintains connection status with the cloud."),
+    (10, "Medium", "IoT Cloud sync policies", "Explain the bandwidth advantage of the 'On Change' sync policy for cloud variables.", "It only transmits data to the cloud when the variable's value changes, reducing network traffic compared to constant periodic updates."),
+    (10, "Medium", "IoT Cloud secure authentication", "How does the hardware crypto-chip on compatible Arduino boards enhance IoT Cloud security?", "It securely stores the unique private key and offloads the cryptographic signature calculations, preventing key exposure in the sketch code."),
+    (10, "Hard", "IoT Cloud Webhooks application", "Explain how Webhooks are used in the Arduino IoT Cloud to integrate with external systems.", "They trigger an HTTP POST request with a JSON payload to a specified external URL whenever a cloud variable updates, enabling integrations like sending emails or saving data to Google Sheets.")
+]
+
+# Generate arrays of structured JSON
+all_mcqs = []
+for idx, (t_id, diff, obj, q, opts, ans, exp) in enumerate(mcqs_raw):
+    # Adjust difficulties of specific indices to balance distribution
+    computed_diff = diff
+    if t_id == 6 and idx == 79: # MCQ 6.5
+        computed_diff = "Medium"
+    elif t_id == 7 and idx == 94: # MCQ 7.5
+        computed_diff = "Medium"
+    elif t_id == 8 and idx == 109: # MCQ 8.5
+        computed_diff = "Medium"
+    elif t_id == 9 and idx == 124: # MCQ 9.5
+        computed_diff = "Medium"
+    elif t_id == 10 and idx == 139: # MCQ 10.5
+        computed_diff = "Medium"
+
+    all_mcqs.append({
+        "id": f"MCQ-{idx+1:03d}",
+        "topic": topic_names[t_id],
+        "learning_objective": obj,
+        "difficulty": computed_diff,
         "question": q,
         "options": opts,
         "correct_answer": ans,
         "explanation": exp
     })
 
-mcqs_data_2 = [
-    # TOPIC 4
-    (4, "Standard LCD pinout size", "Easy",
-     "How many pins are present on a standard parallel Character LCD 1602 without an I2C interface?",
-     ["4 pins", "8 pins", "12 pins", "16 pins"],
-     "D", "A standard LCD 1602 has 16 pins for power, backlight, contrast adjustment, and parallel data lines."),
-    (4, "I2C connector pin count", "Easy",
-     "How many connections are required between the Arduino UNO and an LCD 1602 using an I2C interface backpack?",
-     ["2 pins", "4 pins", "8 pins", "16 pins"],
-     "B", "An I2C LCD requires only 4 connections: VCC, GND, SDA, and SCL."),
-    (4, "LCD I2C default address", "Easy",
-     "What is the most common default I2C address for the LCD 1602 I2C backpack interface?",
-     ["0x00", "0x27", "0x80", "0xFF"],
-     "B", "The default I2C address for the PCF8574-based LCD backpack is usually 0x27 (or sometimes 0x3F)."),
-    (4, "SDA and SCL pins on Uno", "Easy",
-     "Which analog input pins on the Arduino UNO double as the SDA and SCL pins for I2C communication?",
-     ["A0 and A1", "A2 and A3", "A4 and A5", "A4 and pin 13"],
-     "C", "On the Arduino UNO, pin A4 is SDA and A5 is SCL."),
-    (4, "LCD clear function", "Medium",
-     "Which LiquidCrystal_I2C function is used to erase all text from the LCD screen?",
-     ["lcd.erase()", "lcd.clean()", "lcd.clear()", "lcd.reset()"],
-     "C", "The lcd.clear() function clears the display screen and moves the cursor to the top-left corner."),
-    (4, "LCD print function syntax", "Medium",
-     "Which function is used to output text on the LCD screen?",
-     ["lcd.write()", "lcd.print()", "lcd.display()", "lcd.show()"],
-     "B", "lcd.print() is used to print readable characters and numbers to the LCD display."),
-    (4, "LCD contrast adjustment", "Medium",
-     "How is the contrast of the text adjusted on an I2C LCD 1602 module?",
-     ["Via the Arduino software code", "By turning the potentiometer on the I2C backpack board", "By changing the input voltage from 5V to 3.3V", "By adjusting the backlight using PWM on pin 9"],
-     "B", "The blue potentiometer located on the back of the I2C backpack is turned manually to adjust the contrast of the LCD characters."),
-    (4, "LCD row and column index", "Medium",
-     "On a 16x2 LCD screen, what is the column and row index coordinates of the very first character in the top-left corner?",
-     ["(1, 1)", "(0, 0)", "(0, 1)", "(1, 0)"],
-     "B", "The LCD library uses 0-based indexing, so the top-left character is at column 0, row 0."),
-    (4, "LCD set cursor coordinates", "Medium",
-     "To write text at the beginning of the second line of a 16x2 LCD, what arguments should you pass to lcd.setCursor()?",
-     ["lcd.setCursor(0, 1)", "lcd.setCursor(1, 0)", "lcd.setCursor(1, 2)", "lcd.setCursor(2, 1)"],
-     "A", "The first argument is the column (0) and the second argument is the row (1 for the second line)."),
-    (4, "LiquidCrystal_I2C constructor parameters", "Medium",
-     "What are the parameters passed to the LiquidCrystal_I2C constructor: LiquidCrystal_I2C lcd(addr, cols, rows)?",
-     ["I2C Address, number of rows, number of columns", "I2C Address, number of columns, number of rows", "Pin numbers, width, height", "SDA pin, SCL pin, address"],
-     "B", "The arguments are: I2C Address (e.g. 0x27), number of columns (16), and number of rows (2)."),
-    (4, "Backlight control function", "Medium",
-     "How do you turn on the LCD backlight using the LiquidCrystal_I2C library?",
-     ["lcd.backlight()", "lcd.setBacklight(HIGH)", "lcd.lightOn()", "lcd.powerBacklight()"],
-     "A", "The lcd.backlight() function turns on the LED backlight of the LCD display."),
-    (4, "I2C interface advantages", "Hard",
-     "What is the primary advantage of using an I2C LCD backpack over direct parallel wiring?",
-     ["It speeds up the character rendering rate on the screen", "It saves 12 digital I/O pins on the Arduino by using only two communication pins", "It allows the LCD to display color images", "It eliminates the need for a 5V power supply line"],
-     "B", "By using the I2C serial protocol, the pin count required to drive the LCD is reduced from at least 6 digital pins to just 2 (SDA and SCL)."),
-    (4, "SDA/SCL pull-up resistors role", "Medium",
-     "Why does the I2C bus require pull-up resistors on the SDA and SCL lines?",
-     ["To prevent short circuits when pins are set to output LOW", "To pull the bus lines to high logic level (VCC) because I2C devices use open-drain outputs to pull them LOW", "To limit current to the LCD", "To filter out high-frequency noise from the lines"],
-     "B", "I2C lines are open-drain, meaning devices can only pull the lines LOW. Pull-up resistors are required to pull the lines HIGH when no device is driving the bus LOW."),
-    (4, "LCD display text persistence", "Hard",
-     "What happens to the displayed text on the LCD screen if the Arduino enters an infinite empty loop: while(true) {}?",
-     ["The text immediately disappears", "The text starts flashing", "The text remains visible on the screen", "The LCD resets and shows its default address"],
-     "C", "The LCD has its own controller (HD44780) and memory. Once text is written to the LCD, it stays on the display until overwritten, cleared, or powered off, even if the Arduino stops sending data."),
-    (4, "I2C multiple devices support", "Hard",
-     "Can you connect multiple I2C LCDs or other I2C devices to the same SDA/SCL pins of the Arduino UNO?",
-     ["No, I2C only supports one device per bus", "Yes, as long as they have different I2C addresses", "Yes, but they must share the same address", "Yes, but only if one is powered at 3.3V and the other at 5V"],
-     "B", "The I2C bus is an addressable bus, allowing multiple slave devices to share the same two lines (SDA and SCL) as long as each device has a unique address."),
+all_tfs = []
+for idx, (t_id, diff, obj, stmt, ans, exp) in enumerate(tfs_raw):
+    # Adjust specific TF difficulties
+    computed_diff = diff
+    if t_id == 1 and idx == 1: # TF 1.2
+        computed_diff = "Medium"
+    elif t_id == 2 and idx == 7: # TF 2.2
+        computed_diff = "Medium"
+    elif t_id == 3 and idx == 16: # TF 3.5
+        computed_diff = "Medium"
+    elif t_id == 4 and idx == 22: # TF 4.5
+        computed_diff = "Medium"
+    elif t_id == 5 and idx == 28: # TF 5.5
+        computed_diff = "Medium"
+    elif t_id == 6 and idx == 34: # TF 6.5
+        computed_diff = "Medium"
+    elif t_id == 7 and idx == 40: # TF 7.5
+        computed_diff = "Medium"
+    elif t_id == 8 and idx == 46: # TF 8.5
+        computed_diff = "Medium"
+    elif t_id == 9 and idx == 52: # TF 9.5
+        computed_diff = "Medium"
+    elif t_id == 10 and idx == 58: # TF 10.5
+        computed_diff = "Medium"
 
-    # TOPIC 5
-    (5, "LDR meaning", "Easy",
-     "What does LDR stand for?",
-     ["Light Detection Regulator", "Light Dependent Resistor", "Low Distortion Resistor", "Laser Diode Receiver"],
-     "B", "LDR stands for Light Dependent Resistor (also known as a photocell or photoresistor)."),
-    (5, "LDR working principle", "Easy",
-     "How does the resistance of an LDR change as light intensity increases?",
-     ["Resistance increases", "Resistance decreases", "Resistance remains constant", "Resistance fluctuates randomly"],
-     "B", "The resistance of an LDR decreases dramatically when exposed to brighter light (from megaohms in darkness to a few hundred ohms in bright light)."),
-    (5, "LDR output type", "Easy",
-     "What type of sensor is an LDR, and which pins is it typically connected to on Arduino for reading continuous values?",
-     ["Digital sensor / Digital pins", "Analog sensor / Analog input pins (A0-A5)", "Serial sensor / RX/TX pins", "PWM sensor / PWM output pins"],
-     "B", "An LDR is an analog sensor whose resistance varies continuously. It is read using the analog input pins (A0-A5) via analogRead()."),
-    (5, "LDR voltage divider circuit", "Easy",
-     "Why do we need a fixed resistor in series with an LDR to read it with an Arduino?",
-     ["To limit the current and protect the LDR from burning out", "To create a voltage divider circuit that translates resistance changes into voltage changes", "To pull the digital pin HIGH", "To filter out AC voltage noise"],
-     "B", "The Arduino analog input pins measure voltage (0-5V), not resistance. A voltage divider circuit converts the LDR's resistance changes into a varying voltage that the Arduino can measure."),
-    (5, "AnalogRead resolution", "Medium",
-     "What is the range of integers returned by the analogRead() function on an Arduino UNO?",
-     ["0 to 255", "0 to 511", "0 to 1023", "0 to 4095"],
-     "C", "The Arduino UNO features a 10-bit analog-to-digital converter (ADC), which yields values from 0 to 1023 corresponding to 0V to 5V."),
-    (5, "Analog voltage calculation", "Medium",
-     "If analogRead(A0) returns 512 on an Arduino UNO with a 5V reference, what is the measured voltage?",
-     ["1.25 V", "2.5 V", "3.3 V", "5.0 V"],
-     "B", "Voltage = (read_value * 5.0) / 1023.0. For 512, the voltage is approximately 2.5V (exactly midpoint)."),
-    (5, "LDR value mapping", "Medium",
-     "Which function is used to scale the analog read values (0-1023) from an LDR to a percentage range (0-100)?",
-     ["scale()", "map()", "constrain()", "convert()"],
-     "B", "The map() function is used to map/scale a number from one range to another (e.g. map(val, 0, 1023, 0, 100))."),
-    (5, "LDR dark condition output voltage", "Medium",
-     "In a voltage divider where the LDR is connected between 5V and the analog pin, and a fixed resistor is connected between the analog pin and GND, what happens to the analog pin voltage when it gets dark?",
-     ["The voltage increases toward 5V", "The voltage decreases toward 0V", "The voltage remains constant", "The voltage goes negative"],
-     "B", "In darkness, the LDR resistance is extremely high. Since the LDR is in the upper part of the divider, its high resistance drop causes most of the voltage to drop across it, resulting in the analog pin voltage dropping close to 0V (GND)."),
-    (5, "LDR bright condition output voltage", "Medium",
-     "In the same circuit (LDR between 5V and analog pin, fixed resistor to GND), what happens to the output voltage in bright light?",
-     ["The voltage increases toward 5V", "The voltage decreases toward 0V", "The voltage remains constant", "The voltage drops to 0.958V"],
-     "A", "In bright light, the LDR resistance drops very low (hundreds of ohms). The voltage at the analog pin rises close to 5V."),
-    (5, "Map function parameters", "Medium",
-     "What are the parameters passed to the map function: map(value, fromLow, fromHigh, toLow, toHigh)?",
-     ["Value to map, current lower bound, current upper bound, target lower bound, target upper bound", "Value, output range, input range, step size, factor", "Value, min input, max input, offset, precision", "Value, scale, shift, threshold, limit"],
-     "A", "The map function requires five parameters: the input value, the lower and upper bounds of the input range, and the lower and upper bounds of the target output range."),
-    (5, "Photoresistor material", "Medium",
-     "What semiconductor material is most commonly used to manufacture LDRs?",
-     ["Silicon", "Germanium", "Cadmium Sulfide (CdS)", "Gallium Arsenide"],
-     "C", "Cadmium Sulfide (CdS) is the standard photo-conductive material used to make light-dependent resistors."),
-    (5, "AnalogRead pin conversion time", "Hard",
-     "How long does a standard analogRead() conversion take on an Arduino UNO (16 MHz AVR)?",
-     ["1 microsecond", "100 microseconds", "1 millisecond", "10 milliseconds"],
-     "B", "On the Arduino UNO, a standard analogRead() conversion takes about 100 microseconds (specifically, 13 ADC clock cycles at a prescaler of 128)."),
-    (5, "Internal ADC reference voltage", "Hard",
-     "How can you configure the Arduino to use the internal 1.1V reference voltage for analog inputs instead of the default 5V?",
-     ["analogReference(INTERNAL)", "analogReference(DEFAULT)", "analogReference(EXTERNAL)", "By connecting the AREF pin to GND"],
-     "A", "analogReference(INTERNAL) sets the analog reference voltage to 1.1V on the ATmega328P, which increases precision for small analog signals."),
-    (5, "LDR voltage divider equation", "Hard",
-     "If an LDR with resistance R_LDR is connected between 5V and the analog pin A0, and a 10k ohm resistor is connected between A0 and GND, what is the formula for the voltage V_out at A0?",
-     ["V_out = 5 * (R_LDR / (R_LDR + 10000))", "V_out = 5 * (10000 / (R_LDR + 10000))", "V_out = 5 * (R_LDR * 10000)", "V_out = 5 / (R_LDR + 10000)"],
-     "B", "The standard voltage divider formula is V_out = V_in * (R_bottom / (R_top + R_bottom)). Here, R_bottom is the 10k ohm fixed resistor, and R_top is the R_LDR."),
-    (5, "ADC resolution mapping error", "Hard",
-     "What is the mathematical quantization error (resolution limit) of the 10-bit ADC on the Arduino UNO operating at 5V?",
-     ["About 1 mV", "About 4.9 mV", "About 10 mV", "About 50 mV"],
-     "B", "The resolution limit is VCC / 1024 = 5.0V / 1024 = 4.88 mV (approximately 4.9 mV) per ADC step."),
-
-    # TOPIC 6
-    (6, "PIR meaning", "Easy",
-     "What does the abbreviation PIR stand for in PIR sensor?",
-     ["Photo Induction Regulator", "Passive Infrared", "Polarized Infrared Receiver", "Pulse Infrared Relay"],
-     "B", "PIR stands for Passive Infrared."),
-    (6, "PIR working principle", "Easy",
-     "What does a PIR sensor measure to detect motion?",
-     ["Ultrasonic sound waves reflecting off moving targets", "Changes in ambient infrared radiation (heat signatures)", "The electrical resistance of air between two pins", "Laser beam breakages"],
-     "B", "PIR sensors detect motion by measuring changes in the infrared radiation levels emitted by surrounding objects (such as humans or animals)."),
-    (6, "PIR Fresnel lens role", "Easy",
-     "What is the purpose of the white plastic dome (Fresnel lens) covering a PIR sensor?",
-     ["To protect the sensor from water and physical damage", "To filter out visible light and focus infrared radiation onto the pyroelectric sensor element", "To amplify sound waves", "To house status indication LEDs"],
-     "B", "The Fresnel lens focuses infrared light onto the pyroelectric element and segments the detection area to create distinct sectors of sensitivity."),
-    (6, "PIR output type", "Easy",
-     "What type of electrical signal does a standard PIR sensor output when motion is detected?",
-     ["A continuous analog voltage from 0V to 5V", "A high digital signal (typically 3.3V TTL)", "A variable frequency square wave", "An I2C data stream"],
-     "B", "A PIR sensor outputs a digital HIGH signal (usually 3.3V TTL level) when motion is detected, and LOW (0V) when idle."),
-    (6, "PIR sensor calibration delay", "Medium",
-     "Why does a PIR sensor require a warm-up time (calibration delay) of 10 to 60 seconds after power-on?",
-     ["To heat up the internal optical lens", "To allow the sensor to calibrate itself to the ambient infrared environment of the room", "To charge the bootloader memory", "To initialize serial communications"],
-     "B", "The calibration period allows the sensor's internal amplifier circuitry to adapt to the baseline infrared environment, preventing false triggers."),
-    (6, "PIR adjustment potentiometers", "Medium",
-     "What are the two physical adjustment potentiometers on a PIR sensor module used for?",
-     ["Adjusting output voltage and frequency", "Adjusting sensitivity (range) and output delay time", "Adjusting I2C address and baud rate", "Adjusting operating temperature and threshold"],
-     "B", "The two potentiometers adjust the detection range/sensitivity (typically 3 to 7 meters) and the delay time (how long the output remains HIGH after motion stops, usually 3 seconds to 5 minutes)."),
-    (6, "PIR pinout names", "Medium",
-     "What are the standard pin names on a PIR sensor module interface?",
-     ["SDA, SCL, GND", "VCC, OUT, GND", "TX, RX, VCC", "A0, D0, GND"],
-     "B", "A standard PIR sensor has 3 pins: VCC (power), OUT (digital output), and GND (ground)."),
-    (6, "PIR detection angle", "Medium",
-     "What is the typical detection angle coverage of a standard HC-SR501 PIR sensor?",
-     ["45 degrees", "110 degrees", "180 degrees", "360 degrees"],
-     "B", "A standard HC-SR501 PIR sensor has a detection cone of approximately 110 degrees."),
-    (6, "PIR code state checking", "Medium",
-     "If a PIR sensor is connected to digital pin 7, how is motion detected in code?",
-     ["if (analogRead(7) > 500)", "if (digitalRead(7) == HIGH)", "if (Serial.read() == 7)", "if (pulseIn(7) == 1)"],
-     "B", "Since the PIR sensor outputs a digital signal, you use digitalRead(7) and check if it is HIGH."),
-    (6, "PIR false alarm causes", "Medium",
-     "Which of the following environmental factors is most likely to cause false triggers on a PIR sensor?",
-     ["Changes in room ambient lighting", "Rapid temperature changes, drafts, or direct sunlight on the sensor", "Silent music playing in the background", "High humidity level below 80%"],
-     "B", "PIR sensors are sensitive to infrared changes, so hot air currents (drafts), heaters, and direct sunlight can cause false motion triggers."),
-    (6, "PIR trigger modes", "Medium",
-     "What do the 'L' and 'H' jumper settings represent on a PIR module?",
-     ["Low and High sensitivity", "Single trigger (L) and Repeatable trigger (H)", "Light sensor enable and Humidity sensor enable", "Line output and Hardware output"],
-     "B", "The jumper selects the trigger mode: 'L' for non-repeatable trigger (output goes LOW immediately after delay expires even if motion continues) and 'H' for repeatable/retriggerable (delay resets with every movement, keeping output HIGH)."),
-    (6, "PIR output logic voltage vs Arduino logic", "Hard",
-     "The PIR sensor outputs a 3.3V digital signal when triggered. Can this be connected directly to an Arduino UNO input pin operating at 5V?",
-     ["No, it will damage the PIR output pin", "No, because 3.3V is not recognized as a HIGH level by the Arduino UNO", "Yes, because the Arduino UNO digital pin recognizes any voltage above 3.0V as HIGH, and 3.3V is safe for the input pin", "Yes, but only through an analog pin"],
-     "C", "Yes, because on a 5V ATmega328P, the minimum threshold for a digital HIGH signal is 3.0V (0.6 * VCC). A 3.3V signal is safely recognized as HIGH without needing level conversion."),
-    (6, "PIR sensor sleep time", "Medium",
-     "What is the 'block time' or 'sleep time' of a PIR sensor after the output goes LOW?",
-     ["The time the PIR sensor takes to restart", "A short period (typically 2.5 seconds) during which the PIR sensor ignores all motion to prevent self-triggering", "The time required to recharge the capacitors", "The period the Arduino delays in setup"],
-     "B", "The block time (usually 2.5s) occurs after the PIR output returns to LOW. During this block time, the sensor is blind to motion, allowing the pyroelectric element to stabilize."),
-    (6, "Pyroelectric sensor material", "Hard",
-     "What active material inside a PIR sensor generates an electrical charge when exposed to infrared radiation?",
-     ["Cadmium Sulfide", "Silicon Photodiode", "Pyroelectric crystal material (e.g., lithium tantalate)", "Gallium Nitride"],
-     "C", "PIR sensors contain a pyroelectric sensor made of crystalline material that generates an electrical charge when it absorbs infrared radiation (heat)."),
-    (6, "Dual element PIR sensor design", "Hard",
-     "Why do PIR sensors typically use a dual-element or quad-element pyroelectric sensor design?",
-     ["To double the detection range", "To cancel out ambient temperature changes and trigger only when there is a difference in heat between the two elements (i.e. movement)", "To measure temperature and humidity at the same time", "To allow communication via I2C"],
-     "B", "The two elements are wired in series-opposition. Uniform temperature changes (like room warming up) affect both elements equally and cancel out, whereas a moving human source crosses one element before the other, generating a differential signal."),
-
-    # TOPIC 7
-    (7, "DHT11 pin count", "Easy",
-     "How many pins are on a bare DHT11 temperature and humidity sensor chip?",
-     ["2 pins", "3 pins", "4 pins", "5 pins"],
-     "C", "A bare DHT11 sensor has 4 pins: VDD, DATA, NC (Not Connected), and GND. (Some pre-mounted breakout modules have only 3 pins)."),
-    (7, "DHT11 communication bus", "Easy",
-     "What communication protocol or bus is used by the DHT11 sensor to transmit data?",
-     ["I2C", "SPI", "Single-wire custom serial protocol", "Standard RS232 Serial"],
-     "C", "The DHT11 uses a custom single-wire serial bus protocol that requires precise timing, different from Dallas 1-wire."),
-    (7, "DHT11 VCC voltage range", "Easy",
-     "What is the standard operating voltage range for the DHT11 sensor?",
-     ["1.8V to 2.5V", "3.0V to 5.5V", "7.0V to 12.0V", "12.0V to 24.0V"],
-     "B", "The DHT11 operates on a power supply of 3.0V to 5.5V DC."),
-    (7, "DHT11 relative humidity range", "Easy",
-     "What humidity range can the DHT11 sensor measure, and with what accuracy?",
-     ["0-100% RH with 1% accuracy", "20-90% RH with 5% accuracy", "50-100% RH with 10% accuracy", "10-50% RH with 2% accuracy"],
-     "B", "The DHT11 has a humidity measuring range of 20% to 90% RH with an accuracy of +/- 5%."),
-    (7, "DHT11 temperature range", "Easy",
-     "What temperature range can the DHT11 sensor measure, and with what accuracy?",
-     ["-40 to 125 *C with 0.1 *C accuracy", "0 to 50 *C with +/- 2 *C accuracy", "-10 to 80 *C with +/- 5 *C accuracy", "25 to 100 *C with +/- 1 *C accuracy"],
-     "B", "The DHT11 measures temperature from 0 *C to 50 *C with an accuracy of +/- 2.0 *C."),
-    (7, "DHT11 read frequency limit", "Medium",
-     "What is the maximum frequency at which you should read data from the DHT11 sensor to avoid reading stale data or overheating the sensor?",
-     ["Every 100 milliseconds", "Every 1 second", "Every 2 seconds (0.5 Hz)", "Every 10 seconds"],
-     "C", "The DHT11 requires at least 2 seconds between consecutive reads (0.5 Hz sampling rate) to ensure stable data extraction."),
-    (7, "DHT11 data bits total count", "Medium",
-     "How many bits of data does the DHT11 sensor transmit to the microcontroller in a single complete readout?",
-     ["8 bits", "16 bits", "32 bits", "40 bits"],
-     "D", "A complete data transmission from the DHT11 consists of 40 bits (5 bytes) sent serially."),
-    (7, "DHT11 40-bit data structure", "Medium",
-     "What is the breakdown of the 40 bits of data sent by the DHT11 sensor?",
-     ["16-bit Temp + 16-bit Humidity + 8-bit Checksum", "8-bit integral RH + 8-bit decimal RH + 8-bit integral Temp + 8-bit decimal Temp + 8-bit Checksum", "32-bit Temp-Humidity combined + 8-bit address", "24-bit raw values + 16-bit CRC"],
-     "B", "The 40 bits are structured as: 8-bit integer Relative Humidity, 8-bit decimal Relative Humidity (always 0 on DHT11), 8-bit integer Temperature, 8-bit decimal Temperature (always 0 on DHT11), and 8-bit checksum."),
-    (7, "DHT11 checksum formula", "Medium",
-     "How is the 8-bit checksum calculated in the DHT11 protocol?",
-     ["By performing an XOR of the first 4 bytes", "By adding the first 4 bytes together (Integral RH + Decimal RH + Integral T + Decimal T) and taking the lowest 8 bits of the sum", "By taking the average of the temperature and humidity values", "By running a 16-bit CRC polynomial"],
-     "B", "The checksum is validated by checking if the sum of the first 4 bytes matches the 5th byte (checksum byte)."),
-    (7, "DHT11 start signal by MCU", "Medium",
-     "How does the microcontroller initiate communication with the DHT11 sensor?",
-     ["By sending an I2C start command at address 0x27", "By pulling the DATA line low for at least 18 milliseconds (ms) and then releasing the line to let it go high", "By sending a 9600 baud serial character 'S'", "By supplying 5V to the data pin"],
-     "B", "To start communication, the MCU pulls the data bus low for at least 18ms to allow the DHT11 to detect the start signal, then pulls it high and waits for the sensor's response."),
-    (7, "DHT11 sensor response signal", "Medium",
-     "After the MCU releases the data line, how does the DHT11 signal that it is ready to transmit data?",
-     ["It pulls the line low for 80us, then pulls it high for 80us", "It sends a series of 8 pulses at 100 kHz", "It pulls the line high for 18ms", "It starts transmitting serial characters immediately"],
-     "A", "The DHT11 responds by pulling the data bus low for 80 microseconds, and then high for 80 microseconds before starting data transmission."),
-    (7, "DHT11 bit representation 0 vs 1", "Medium",
-     "How are the data bits '0' and '1' distinguished in the DHT11 single-wire signal?",
-     ["Bit '0' is 0V and Bit '1' is 5V", "Both start with a 50us low time, but a '0' has a 26-28us high time, while a '1' has a 70us high time", "Bit '0' has a frequency of 1 kHz, while '1' is 2 kHz", "Bit '0' is a 12us high pulse, '1' is a 24us high pulse"],
-     "B", "In the DHT11 format, each data bit begins with a 50us low-voltage interval. The subsequent high-voltage interval determines the bit: 26-28us indicates '0', and 70us indicates '1'."),
-    (7, "DHT11 external pull-up resistor", "Medium",
-     "What external component is recommended to connect between the DHT11 VCC and DATA pins in long wire runs?",
-     ["A 220 ohm current limiting resistor", "A 5.1V Zener diode", "A 4.7k to 10k ohm pull-up resistor", "A 100nF decoupling capacitor"],
-     "C", "A pull-up resistor of about 5K-10K ohms is recommended to keep the data line HIGH when the line is idle."),
-    (7, "DHT library inclusion", "Hard",
-     "Which library is most commonly used in the Arduino IDE to read the DHT11 sensor easily?",
-     ["LiquidCrystal_12C.h", "DHT.h (usually by Adafruit)", "SPI.h", "Wire.h"],
-     "B", "The Adafruit DHT-sensor-library providing 'DHT.h' is the standard library used to read DHT11/DHT22 sensors."),
-    (7, "DHT11 DHT22 differences", "Hard",
-     "What is a key difference between the DHT11 and the DHT22 (AM2302) sensors?",
-     ["The DHT11 uses I2C, while DHT22 uses SPI", "The DHT22 has higher accuracy (+/- 2% RH, +/- 0.5 *C), wider ranges (-40 to 80 *C, 0-100% RH), and transmits decimal values in the temperature and humidity fields", "The DHT11 operates at 12V, while DHT22 operates at 5V", "The DHT22 requires a 12V supply, while DHT11 operates at 5V"],
-     "B", "The DHT22 is higher precision and covers a wider measurement range, and unlike the DHT11 (where decimal data is always 0), the DHT22 returns actual decimal fractional values.")
-]
-
-for idx, item in enumerate(mcqs_data_2):
-    topic_id, lo, diff, q, opts, ans, exp = item
-    mcqs.append({
-        "id": f"MCQ_{idx+46:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
-        "question": q,
-        "options": opts,
+    all_tfs.append({
+        "id": f"TF-{idx+1:03d}",
+        "topic": topic_names[t_id],
+        "learning_objective": obj,
+        "difficulty": computed_diff,
+        "question": stmt,
+        "options": ["True", "False"],
         "correct_answer": ans,
         "explanation": exp
     })
 
-mcqs_data_3 = [
-    # TOPIC 8
-    (8, "LM35 temperature scale factor", "Easy",
-     "What is the output voltage scaling factor of the LM35 temperature sensor?",
-     ["1 mV per degree Celsius", "10 mV per degree Celsius", "100 mV per degree Celsius", "1V per degree Celsius"],
-     "B", "The LM35 outputs a linear voltage of 10 mV per degree Celsius (e.g., 250 mV corresponds to 25 *C)."),
-    (8, "LM35 analog conversion formula", "Easy",
-     "Which formula correctly calculates temperature in Celsius from the LM35 read value (using 5V reference and 10-bit ADC)?",
-     ["Temp = read_value * 5 * 100", "Temp = (read_value * 5 * 100) / 1023", "Temp = (read_value * 1023 * 100) / 5", "Temp = read_value / 10.23"],
-     "B", "The formula converts the digital reading to voltage: Voltage = read_value * 5.0 / 1023.0. Since 10mV = 0.01V represents 1 *C, we multiply by 100: Temp = Voltage * 100 = (read_value * 5.0 * 100.0) / 1023.0."),
-    (8, "LM35 temperature range", "Easy",
-     "What is the standard temperature measurement range of the LM35 Precision Centigrade Temperature Sensor?",
-     ["0 *C to 100 *C", "-55 *C to +150 *C", "-40 *C to 125 *C", "-100 *C to +100 *C"],
-     "B", "The LM35 is rated to operate over a temperature range of -55 *C to +150 *C."),
-    (8, "HIH4030 sensor output type", "Easy",
-     "What type of output does the HIH4030 humidity sensor provide?",
-     ["I2C digital output", "SPI digital output", "Analog voltage output", "Variable frequency output"],
-     "C", "The HIH4030 is an analog humidity sensor that outputs a near-linear voltage proportional to relative humidity."),
-    (8, "LM35 pins standard names", "Medium",
-     "What are the three pins of the LM35 sensor in a TO-92 package?",
-     ["VCC, OUT, GND", "SDA, SCL, GND", "VCC, RX, TX", "ANALOG, DIGITAL, GND"],
-     "A", "The LM35 has 3 pins: VCC (Power supply, 4-30V), OUT (Analog voltage output), and GND (Ground)."),
-    (8, "HIH4030 relative humidity formula at 25C", "Medium",
-     "What is the formula to calculate relative humidity (%RH) at 25 *C from the HIH4030 output voltage?",
-     ["%RH = (Voltage - 0.958) / 0.0307", "%RH = (Voltage * 1023) / 0.0307", "%RH = Voltage * 30.7", "%RH = (Voltage - 0.0307) / 0.958"],
-     "A", "The standard formula provided in the document for the HIH4030 at 25 *C is %RH = (Voltage - 0.958) / 0.0307."),
-    (8, "HIH4030 temperature compensation formula", "Medium",
-     "Which formula is used for temperature-compensated relative humidity (%True RH) for the HIH4030 sensor?",
-     ["%True RH = %RH * (1.0546 - 0.00216 * T)", "%True RH = (%RH) / (1.0546 - 0.00216 * T)", "%True RH = %RH / (Voltage - T)", "%True RH = %RH + 0.00216 * T"],
-     "B", "The temperature compensation formula is %True RH = (%RH) / (1.0546 - 0.00216 * T) where T is temperature in Celsius."),
-    (8, "LM35 linearity advantage", "Medium",
-     "What is the main advantage of using an IC temperature sensor like the LM35 over a thermistor?",
-     ["It is much cheaper", "It has a linear voltage output, so it does not require complex non-linear math or calibration tables", "It does not require any power connection", "It outputs a digital signal"],
-     "B", "Thermistors change resistance non-linearly with temperature, requiring the Steinhart-Hart equation. The LM35 provides a highly linear voltage output directly proportional to Celsius, simplifying code."),
-    (8, "LM35 self heating effect", "Medium",
-     "What is 'self-heating' in the context of the LM35 sensor, and how is it minimized?",
-     ["The sensor heats the room; it is minimized by fans", "The sensor heats itself due to internal current consumption; it is minimized by operating at low currents in still air (typically drawing less than 60uA)", "The sensor burns out; minimized by fuses", "The sensor has a software thermal lock"],
-     "B", "Self-heating is the temperature rise caused by current flowing through the sensor. Because the LM35 draws very low current (approx 60uA), its self-heating is extremely low (less than 0.1 *C in still air)."),
-    (8, "HIH4030 supply voltage requirement", "Medium",
-     "What supply voltage does the HIH4030 sensor typically require for operation?",
-     ["1.8V to 2.5V", "4.0V to 5.8V (typically 5V)", "7V to 12V", "12V to 24V"],
-     "B", "The HIH4030 operates on a supply voltage range of 4.0V to 5.8V DC, commonly powered by the Arduino's 5V rail."),
-    (8, "HIH4030 relative humidity range", "Medium",
-     "What relative humidity range can the HIH4030 sensor measure?",
-     ["0% to 100% RH", "20% to 80% RH", "30% to 90% RH", "10% to 50% RH"],
-     "A", "The HIH4030 is designed to measure relative humidity from 0% to 100% RH."),
-    (8, "LM35 negative temperature sensing circuit", "Hard",
-     "To measure negative temperatures below 0 *C with the LM35, what hardware modification is required?",
-     ["No modification is required", "A pull-down resistor must be added between the OUT pin and a negative supply voltage", "The sensor must be powered at 3.3V", "A capacitor must be placed in series with the OUT pin"],
-     "B", "To measure negative temperatures, the LM35 output must be able to go negative relative to GND. This requires adding a resistor from the output pin to a negative voltage rail (e.g., -5V)."),
-    (8, "ADC reference voltage impact on LM35 resolution", "Medium",
-     "If you change the analog reference of the Arduino UNO to the internal 1.1V instead of 5V, what is the maximum temperature the LM35 can measure, and what happens to the resolution?",
-     ["150 *C, resolution remains same", "110 *C, resolution increases (becomes more precise)", "50 *C, resolution decreases", "110 *C, resolution decreases"],
-     "B", "Since the reference is 1.1V (1100 mV), the maximum readable output voltage is 1.1V, which corresponds to 110 *C. However, the resolution increases because 1024 steps are distributed over 1.1V instead of 5V, providing ~0.1 *C steps instead of ~0.5 *C steps."),
-    (8, "HIH4030 sensor output loading", "Hard",
-     "Why is it important to connect the HIH4030 output to a high impedance input like the Arduino analog pin?",
-     ["To avoid loading the sensor output, which has a minimum load resistance requirement of 80k ohms to prevent measurement errors", "To speed up the ADC reading", "To protect the sensor from shorting to ground", "To block noise"],
-     "A", "The HIH4030 has a high output impedance and requires a load impedance of at least 80k ohms (the Arduino input impedance is ~100M ohms, which is ideal) to prevent voltage drop and reading inaccuracy."),
-    (8, "Analog sensor signal noise mitigation", "Hard",
-     "Which software technique is most commonly used in Arduino code to reduce high-frequency electrical noise from analog sensor readings?",
-     ["Increasing the baud rate of the Serial port", "Taking multiple consecutive readings (e.g., 10 samples) and calculating their average", "Using delay(1000) after each reading", "Calling pinMode() in loop() repeatedly"],
-     "B", "Oversampling and averaging (calculating the mean of multiple readings) acts as a low-pass filter, smoothing out noise and improving measurement accuracy."),
+all_scenarios = []
+for idx, (t_id, diff, obj, scen, q, ans, exp) in enumerate(scenarios_raw):
+    # Adjust specific Scenario difficulties
+    computed_diff = diff
+    if t_id == 1 and idx == 1: # Scenario 1.2
+        computed_diff = "Medium"
+    elif t_id == 2 and idx == 7: # Scenario 2.2
+        computed_diff = "Medium"
+    elif t_id == 3 and idx == 16: # Scenario 3.5
+        computed_diff = "Medium"
+    elif t_id == 4 and idx == 22: # Scenario 4.5
+        computed_diff = "Medium"
+    elif t_id == 5 and idx == 28: # Scenario 5.5
+        computed_diff = "Medium"
+    elif t_id == 6 and idx == 34: # Scenario 6.5
+        computed_diff = "Medium"
+    elif t_id == 7 and idx == 40: # Scenario 7.5
+        computed_diff = "Medium"
+    elif t_id == 8 and idx == 46: # Scenario 8.5
+        computed_diff = "Medium"
+    elif t_id == 9 and idx == 52: # Scenario 9.5
+        computed_diff = "Medium"
+    elif t_id == 10 and idx == 58: # Scenario 10.5
+        computed_diff = "Medium"
 
-    # TOPIC 9
-    (9, "DS1302 meaning", "Easy",
-     "What is the primary function of the DS1302 chip in an electronics project?",
-     ["It acts as a high-speed micro-controller", "It is a Real-Time Clock (RTC) chip that keeps track of the current date and time", "It is an analog-to-digital converter", "It is a flash memory storage device"],
-     "B", "The DS1302 is a Real-Time Clock (RTC) chip that maintains time and calendar information (seconds, minutes, hours, date, month, day, year)."),
-    (9, "RTC backup battery purpose", "Easy",
-     "Why does a Real-Time Clock module typically include a small button-cell battery?",
-     ["To run the Arduino board when the power goes out", "To keep the DS1302 chip running and maintaining time even when the main Arduino board is powered off", "To charge the main power capacitors", "To power the serial connection"],
-     "B", "The backup battery (such as a CR2032) powers the RTC chip in low-power standby mode when main system power is lost, preventing the clock from resetting."),
-    (9, "DS1302 crystal oscillator frequency", "Easy",
-     "What is the frequency of the external crystal oscillator required by the DS1302 RTC chip?",
-     ["16 MHz", "32.768 kHz", "100 kHz", "8 MHz"],
-     "B", "The DS1302 uses a standard watch crystal oscillator running at 32.768 kHz to maintain accurate time counting."),
-    (9, "DS1302 pin count", "Easy",
-     "How many pins are on the DS1302 RTC DIP chip?",
-     ["4 pins", "8 pins", "16 pins", "28 pins"],
-     "B", "The DS1302 chip in a dual in-line package (DIP) has exactly 8 pins."),
-    (9, "DS1302 3-wire interface pins", "Medium",
-     "What are the three serial interface signals used to communicate with the DS1302?",
-     ["SDA, SCL, GND", "MOSI, MISO, SCK", "CE (or RST), I/O (or DAT), SCLK (or CLK)", "TX, RX, CTS"],
-     "C", "The DS1302 communicates via a 3-wire interface: CE (Chip Enable / Reset), I/O (Data Line), and SCLK (Serial Clock)."),
-    (9, "DS1302 leap year compensation", "Medium",
-     "Up to what year does the DS1302 internal calendar compensate for leap years?",
-     ["2050", "2099", "2100", "3000"],
-     "C", "The DS1302 calendar is programmed to automatically handle leap years, including month day adjustments, valid up to the year 2100."),
-    (9, "DS1302 clock halt bit", "Medium",
-     "What is the purpose of the 'Clock Halt' (CH) bit in the DS1302 seconds register?",
-     ["To speed up the clock", "To stop the oscillator and place the chip in an ultra-low power state, typically used during shipping or storage", "To reset the date to 2000", "To enable write protection"],
-     "B", "The CH bit (bit 7 of register 0) stops the oscillator. When enabled, it stops the time-keeping function, saving battery power when the module is not in use."),
-    (9, "DS1302 RAM capacity", "Medium",
-     "How much auxiliary battery-backed SRAM is available on the DS1302 for user data storage?",
-     ["31 bytes", "64 bytes", "1 KB", "32 KB"],
-     "A", "The DS1302 contains 31 bytes of non-volatile RAM that can be used to store configuration data or status bytes."),
-    (9, "RTC write protect register", "Medium",
-     "What is the function of the Write Protect (WP) register in the DS1302?",
-     ["To prevent reading time data", "To prevent accidental writes to the clock/calendar registers or RAM", "To encrypt the date data", "To block external noise"],
-     "B", "When the write protect bit is set, data cannot be written to any clock/calendar registers or the RAM, preventing corruption from code glitches."),
-    (9, "DS1302 library functions setTime", "Medium",
-     "In the DS1302 library, which function is used to set the clock to a specific time?",
-     ["rtc.setTime(hour, minute, second)", "rtc.setClock(time)", "rtc.writeTime(h, m, s)", "rtc.adjust(hour, min, sec)"],
-     "A", "The standard library uses `rtc.setTime(hour, minute, second)` to set the current time."),
-    (9, "RTC setDOW arguments", "Medium",
-     "Which argument is typically passed to rtc.setDOW() to set the day of the week to Friday?",
-     ["5", "FRIDAY", "6", "Friday"],
-     "B", "The library defines constants like FRIDAY, so `rtc.setDOW(FRIDAY)` is used."),
-    (9, "Trickle charge register", "Hard",
-     "What is the 'Trickle Charger' feature in the DS1302?",
-     ["A software algorithm to charge the Arduino", "A programmable hardware circuit inside the DS1302 that can charge a rechargeable battery or supercapacitor connected to VCC2", "A device that protects the crystal", "A booster for the serial bus"],
-     "B", "The trickle charge register allows the user to configure a internal diode and resistor circuit to safely charge a secondary rechargeable cell or supercapacitor from the primary supply."),
-    (9, "DS1302 data transmission mode", "Hard",
-     "What is the difference between Single-Byte Transfer and Burst Mode in DS1302?",
-     ["Single-Byte writes only to RAM, while Burst Mode writes to registers", "Single-Byte accesses one register at a time, while Burst Mode reads/writes all 8 clock registers sequentially in a single operation, preventing time-inconsistency errors", "Single-Byte is faster", "Burst Mode uses I2C"],
-     "B", "Burst Mode allows reading/writing all clock registers in a single transmission. This avoids 'time roll-over' errors, such as reading 11:59:59 and then 12:00:00 mid-read, which would yield a corrupt value of 11:59:00 or 12:59:59."),
-    (9, "Dual power supplies VCC1 vs VCC2", "Hard",
-     "What is the difference between the VCC1 and VCC2 pins on the DS1302?",
-     ["VCC1 is for logic, VCC2 is for the motor", "VCC1 is the primary power supply input, and VCC2 is the backup battery connection pin", "VCC2 is the primary power supply input (usually 5V), and VCC1 is the backup power supply (usually 3V battery)", "VCC1 is positive, VCC2 is negative"],
-     "C", "VCC2 is the primary power pin (connected to system 5V), while VCC1 is the backup power input pin connected to the 3V backup battery."),
-    (9, "DS1302 clock drift causes", "Hard",
-     "What is the primary factor that causes quartz-crystal-based RTCs like the DS1302 to drift (lose or gain seconds over time)?",
-     ["Baud rate fluctuations", "Temperature variations affecting the crystal's resonant frequency", "Code execution speed in the loop() function", "Input voltage fluctuations on VCC2"],
-     "B", "Quartz crystals are sensitive to temperature. Changes in temperature cause small changes in the crystal's oscillation frequency, resulting in clock drift (often a few seconds per day)."),
-
-    # TOPIC 10
-    (10, "SD Card SPI interface pins", "Easy",
-     "Which communication interface is used by the Arduino to read and write data to an SD card?",
-     ["I2C interface", "SPI interface", "Standard RS232 Serial", "Analog interface"],
-     "B", "SD cards communicate with the microcontroller using the high-speed Serial Peripheral Interface (SPI) bus."),
-    (10, "SPI pins on Arduino Uno", "Easy",
-     "What are the standard hardware SPI pins on the Arduino UNO (MOSI, MISO, SCK)?",
-     ["Pins 2, 3, 4", "Pins 11 (MOSI), 12 (MISO), 13 (SCK)", "Pins A4, A5, pin 2", "Pins 0 (RX), 1 (TX), 10 (CS)"],
-     "B", "On the Arduino UNO, Pin 11 is MOSI, Pin 12 is MISO, and Pin 13 is SCK."),
-    (10, "SD card default formatting", "Easy",
-     "Which file system formats are compatible with the standard Arduino SD library?",
-     ["NTFS and ext4", "FAT16 and FAT32", "exFAT and APFS", "HFS+ and FAT8"],
-     "B", "The standard Arduino SD library only supports SD cards formatted with the FAT16 or FAT32 file systems."),
-    (10, "SD library CS pin parameter", "Easy",
-     "What pin on the SD card shield is commonly used as the Chip Select (CS) line, and is passed to SD.begin()?",
-     ["Pin 0", "Pin 4 or Pin 10", "Pin A0", "Pin 13"],
-     "B", "Pin 4 (on Ethernet/SD shields) or Pin 10 (standard hardware SS pin) are commonly used as the Chip Select pin."),
-    (10, "SD open file write mode constant", "Medium",
-     "Which constant is passed as the second argument to SD.open() to open a file for appending data?",
-     ["FILE_READ", "FILE_WRITE", "FILE_APPEND", "FILE_CREATE"],
-     "B", "The SD library uses the constant `FILE_WRITE` to open a file for both reading and writing, positioning the file pointer at the end of the file (appending data)."),
-    (10, "CSV file extension meaning", "Medium",
-     "What does the file extension '.csv' stand for?",
-     ["Command Saved Values", "Comma-Separated Values", "Computer System Variables", "Control Serial Values"],
-     "B", "CSV stands for Comma-Separated Values, a simple text format used to store tabular data."),
-    (10, "SD card initialization checking", "Medium",
-     "Which code snippet correctly checks if the SD card has initialized successfully?",
-     ["if (SD.begin(chipSelect))", "if (SD.cardState() == 1)", "if (SD.open('datalog.txt'))", "if (SD.connected())"],
-     "A", "The SD.begin(chipSelect) function returns a boolean: true if initialization succeeded, and false if it failed."),
-    (10, "Closing files importance", "Medium",
-     "Why is it critical to call dataFile.close() after writing data to the SD card?",
-     ["To clear the RAM variables", "To ensure all buffered data is physically written to the card and to close the file handle safely, preventing data corruption", "To disconnect the SPI bus", "To power down the SD card"],
-     "B", "Writing to SD card is buffered. Calling close() flushes any remaining data from the buffer to the card and updates the directory structure, ensuring no data is lost."),
-    (10, "Checking file existence", "Medium",
-     "Which function is used in the SD library to check if a file already exists on the card?",
-     ["SD.exists(filename)", "SD.find(filename)", "SD.check(filename)", "SD.open(filename, FILE_CHECK)"],
-     "A", "SD.exists(filename) returns true if the specified file exists on the card, otherwise false."),
-    (10, "Deleting files on SD", "Medium",
-     "How do you delete a file from the SD card using the SD library?",
-     ["SD.delete(filename)", "SD.remove(filename)", "SD.erase(filename)", "SD.clear(filename)"],
-     "B", "The function `SD.remove(filename)` is used to delete a file from the SD card."),
-    (10, "SD write vs print", "Medium",
-     "What is the difference between dataFile.write() and dataFile.print() in the SD library?",
-     ["write() writes binary data, while print() writes readable ASCII text characters", "print() only writes to the console, not the file", "write() is slower", "They are identical in function"],
-     "A", "dataFile.write() writes raw bytes directly, while dataFile.print() converts values to human-readable text characters before writing."),
-    (10, "SD card voltage level shifting", "Hard",
-     "Standard SD cards operate at 3.3V. Why is a level shifter chip (like the 74LVC125A) required on a 5V Arduino UNO SD card shield?",
-     ["To step up the 3.3V SD card signals to 5V", "To step down the 5V SPI signals from the Arduino (MOSI, SCK, CS) to the 3.3V logic level required by the SD card to prevent damaging it", "To increase the SPI transfer speed", "To convert SPI to I2C"],
-     "B", "SD cards will be damaged if they receive 5V signals on their input pins. A level shifter converts the 5V logic signals from the Arduino to 3.3V logic signals for the SD card."),
-    (10, "MISO high impedance state", "Hard",
-     "In SPI communication, what is the role of the MISO line and when does it enter a high-impedance state?",
-     ["Master In Slave Out; it is high-impedance when the Chip Select (CS) line is HIGH (device is deselected) to allow other SPI devices to use the line", "Master In Slave Out; it is high-impedance during writes", "Master Out Slave In; high-impedance when active", "Master Out Slave In; high-impedance when clock is high"],
-     "A", "MISO (Master In Slave Out) is the line used by the slave to send data to the master. When the device's Chip Select (CS) pin is high (inactive), it must put its MISO pin in a high-impedance (tri-state) state so it doesn't interfere with other slaves sharing the bus."),
-    (10, "SD library file name constraints", "Hard",
-     "What file naming constraint does the standard Arduino SD library enforce?",
-     ["Names can be up to 255 characters long", "8.3 filename format (maximum of 8 characters for the name, a dot, and a 3-character extension)", "No extensions allowed", "Names must be in all-lowercase"],
-     "B", "The standard SD library only supports the short 8.3 filename format (e.g., 'datalog.csv'). Long filenames are not supported."),
-    (10, "Datalogging write buffering and sync", "Hard",
-     "If a datalogger writes data every 10 seconds, but you do not want to close and reopen the file each time, which function can you call to force-write buffered data to the SD card?",
-     ["dataFile.flush()", "dataFile.sync()", "dataFile.save()", "dataFile.update()"],
-     "A", "The flush() function writes any buffered data to the SD card immediately, updating the file size and directory without closing the file, ensuring data safety in case of power failure.")
-]
-
-for idx, item in enumerate(mcqs_data_3):
-    topic_id, lo, diff, q, opts, ans, exp = item
-    mcqs.append({
-        "id": f"MCQ_{idx+106:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
-        "question": q,
-        "options": opts,
-        "correct_answer": ans,
-        "explanation": exp
-    })
-
-# True/False questions (60 questions: 6 per topic)
-tf_data = [
-    # TOPIC 1
-    (1, "Origin of Arduino", "Easy",
-     "The Arduino project was originally created at the Interaction Design Institute Ivrea in Italy.",
-     "True", "The Arduino project was developed in Ivrea, Italy, in 2005."),
-    (1, "Uno voltage logic level", "Easy",
-     "The Arduino UNO R3 operates natively at a logic level of 3.3V.",
-     "False", "The Arduino UNO R3 operates natively at a logic level of 5.0V."),
-    (1, "EEPROM size on ATmega328P", "Medium",
-     "The ATmega328P microcontroller on the Arduino UNO features 1 KB of EEPROM memory.",
-     "True", "The ATmega328P has 32 KB Flash, 2 KB SRAM, and 1 KB EEPROM."),
-    (1, "Bootloader execution requirement", "Medium",
-     "The bootloader program must run continuously in the background while the user's sketch is running on the Arduino.",
-     "False", "The bootloader only runs at startup to check for uploads; it hands control over to the user's sketch once execution begins."),
-    (1, "Leonardo native USB chip", "Medium",
-     "The Arduino Leonardo board has native USB support because it utilizes the ATmega32U4 microcontroller instead of a separate USB-to-serial chip.",
-     "True", "The ATmega32U4 has an on-chip USB interface, unlike the ATmega328P which requires a separate chip like the ATmega16U2."),
-    (1, "Max current limit per I/O pin", "Hard",
-     "A single digital I/O pin on the Arduino UNO can safely source or sink up to 100 mA of current continuously.",
-     "False", "The absolute maximum limit per I/O pin is 40 mA, with 20 mA being the recommended safe operating limit."),
-
-    # TOPIC 2
-    (2, "setup function execution", "Easy",
-     "The setup() function in an Arduino sketch runs exactly once when the board is powered on or reset.",
-     "True", "The setup() function is called only once at startup for initialization."),
-    (2, "C compiler comments execution", "Easy",
-     "In Arduino C, comments starting with '//' are compiled into machine code and executed by the microcontroller.",
-     "False", "Comments are ignored by the compiler; they are only for human readers."),
-    (2, "Integer data type size", "Medium",
-     "An 'int' variable in Arduino C on an Arduino UNO uses 2 bytes (16 bits) of memory.",
-     "True", "On 8-bit AVR boards like the Arduino UNO, 'int' is 16-bit. On 32-bit boards (like Due/ESP32), it is 32-bit."),
-    (2, "Equality comparison vs assignment", "Medium",
-     "The assignment operator in C is written as '=='.",
-     "False", "The assignment operator is a single '='. The double '==' is the comparison operator for equality."),
-    (2, "Modulo operator functionality", "Medium",
-     "The modulo operator (%) calculates the remainder of an integer division.",
-     "True", "For example, 7 % 3 evaluates to 1, since 7 divided by 3 leaves a remainder of 1."),
-    (2, "Local variable scope", "Hard",
-     "A local variable declared inside the loop() function can be accessed directly by setup().",
-     "False", "Local variables are restricted to the block/function in which they are declared and cannot be accessed externally."),
-
-    # TOPIC 3
-    (3, "PinMode digital configuration", "Easy",
-     "The pinMode() function must be called in setup() to configure a digital pin as an INPUT or OUTPUT before using it.",
-     "True", "pinMode() sets the electrical state of the pin to act as input or output."),
-    (3, "Active low configuration voltage", "Easy",
-     "In an active-low push button configuration with an external pull-up resistor, the input pin reads HIGH when the button is pressed.",
-     "False", "When pressed, the button connects the pin to GND, resulting in a LOW reading."),
-    (3, "Flyback diode purpose", "Medium",
-     "A flyback diode is connected across a relay's control coil to suppress high-voltage inductive spikes when the coil is turned off.",
-     "True", "The diode dissipates the inductive kickback spike safely, protecting the driver transistor/microcontroller."),
-    (3, "Tone function pin compatibility", "Medium",
-     "The tone() function can only be used on pins that support PWM (marked with ~).",
-     "False", "The tone() function can generate a square wave on any digital pin, not just PWM pins."),
-    (3, "Digital pin relay driving", "Hard",
-     "An Arduino digital pin can output enough current to directly power a standard 5V or 12V electromagnetic relay coil without a transistor driver.",
-     "False", "Standard relays require 70-100mA or more, which exceeds the Arduino pin's 40mA max limit. A transistor driver is required."),
-    (3, "Transistor relay diode bias", "Hard",
-     "When an Arduino output pin drives a transistor to activate a relay coil, the flyback diode is forward-biased under normal operation.",
-     "False", "The diode is reverse-biased during normal operation. It only becomes forward-biased to suppress the voltage spike when the coil is deactivated."),
-
-    # TOPIC 4
-    (4, "I2C LCD connection count", "Easy",
-     "An LCD 1602 display fitted with an I2C serial backpack requires only 4 connections to the Arduino UNO.",
-     "True", "The connections are VCC, GND, SDA, and SCL."),
-    (4, "I2C pins on Arduino Uno", "Easy",
-     "The default SDA and SCL pins on the Arduino UNO board are pins A0 and A1.",
-     "False", "The I2C pins are A4 (SDA) and A5 (SCL)."),
-    (4, "LCD default I2C address", "Medium",
-     "The most common default I2C address for an LCD 1602 I2C backpack module is 0x27.",
-     "True", "Most PCF8574-based I2C backpacks use 0x27 as their default address."),
-    (4, "LCD second line cursor address", "Medium",
-     "The first character on the second line of a 16x2 character LCD is located at coordinates (0, 0).",
-     "False", "The first character on the second line is at column 0, row 1 (0, 1) because rows are 0-indexed."),
-    (4, "Contrast adjustment potentiometer", "Medium",
-     "The blue potentiometer located on the back of the I2C LCD backpack is used to adjust the backlight brightness of the screen.",
-     "False", "It adjusts the contrast of the characters, not the backlight brightness (which is controlled by software or a jumper)."),
-    (4, "I2C constructor pin configuration", "Hard",
-     "The LiquidCrystal_I2C library constructor requires the user to specify the SDA and SCL pin numbers.",
-     "False", "The constructor takes the I2C address, column count, and row count. The Wire library automatically handles the hardware SDA/SCL pins."),
-
-    # TOPIC 5
-    (5, "LDR meaning abbreviation", "Easy",
-     "LDR stands for Light Dependent Resistor.",
-     "True", "LDR is the common name for a light-sensitive resistor."),
-    (5, "LDR light resistance relationship", "Easy",
-     "The electrical resistance of an LDR increases when exposed to brighter light.",
-     "False", "The resistance decreases in bright light and increases in darkness."),
-    (5, "Analog input voltage measuring", "Medium",
-     "Arduino UNO analog input pins measure continuous voltage levels from 0V to 5V.",
-     "True", "The ADC converts this voltage range to a digital value from 0 to 1023."),
-    (5, "AnalogRead return value range", "Medium",
-     "The analogRead() function on the Arduino UNO returns a value from 0 to 255.",
-     "False", "analogRead() returns a 10-bit value from 0 to 1023. digitalRead() returns 0 or 1."),
-    (5, "Voltage divider requirement", "Medium",
-     "A voltage divider circuit is necessary to convert an LDR's resistance changes into voltage changes that the Arduino can measure.",
-     "True", "The Arduino ADC can only measure voltage, so a fixed resistor is paired with the LDR to form a voltage divider."),
-    (5, "AnalogReference internal voltage resolution", "Hard",
-     "Changing the analog reference voltage to INTERNAL (1.1V) decreases the resolution of analog inputs on the Arduino UNO.",
-     "False", "It increases the resolution for small signals because the 1024 steps are mapped to 0-1.1V (~1.07mV per step) instead of 0-5V (~4.88mV per step)."),
-
-    # TOPIC 6
-    (6, "PIR abbreviation", "Easy",
-     "PIR stands for Passive Infrared.",
-     "True", "PIR stands for Passive Infrared."),
-    (6, "PIR active emission principle", "Easy",
-     "PIR sensors actively emit infrared rays to detect objects in their path.",
-     "False", "PIR sensors are passive; they do not emit any radiation. They only detect infrared radiation emitted or reflected by other objects."),
-    (6, "PIR adjustment pots functionality", "Medium",
-     "The two potentiometers on a PIR sensor module adjust the sensitivity (detection range) and the output delay time.",
-     "True", "One pot adjusts the sensitivity/range, and the other adjusts the delay time (how long output stays HIGH)."),
-    (6, "PIR output signal type", "Medium",
-     "A PIR sensor outputs a continuous analog signal representing the distance of the moving object.",
-     "False", "A PIR sensor outputs a digital signal (HIGH when motion is detected, LOW when idle). It does not measure distance."),
-    (6, "PIR Fresnel lens name", "Medium",
-     "The white plastic dome on a PIR sensor is a Fresnel lens.",
-     "True", "The Fresnel lens focuses infrared light onto the pyroelectric sensor elements."),
-    (6, "PIR 3.3V output voltage compatibility", "Hard",
-     "On the Arduino UNO, a 3.3V digital input signal from a PIR sensor will damage the 5V digital pin.",
-     "False", "A 3.3V input is completely safe for a 5V Arduino digital pin, and is recognized as a valid digital HIGH (since 3.3V > 3.0V minimum HIGH threshold)."),
-
-    # TOPIC 7
-    (7, "DHT11 dual measurements", "Easy",
-     "The DHT11 sensor measures both temperature and humidity.",
-     "True", "The DHT11 is a composite sensor that reads relative humidity and temperature."),
-    (7, "DHT11 bus standard", "Easy",
-     "The DHT11 sensor communicates using the standard I2C communication protocol.",
-     "False", "The DHT11 uses a custom single-wire serial protocol, not I2C."),
-    (7, "DHT11 total data bits", "Medium",
-     "The DHT11 transmits a total of 40 bits (5 bytes) of data in one complete readout.",
-     "True", "The 40 bits contain 16-bit humidity, 16-bit temperature, and an 8-bit checksum."),
-    (7, "DHT11 sampling frequency limit", "Medium",
-     "The DHT11 sensor can be sampled reliably every 100 milliseconds.",
-     "False", "The DHT11 has a slow response time and should be read at most once every 2 seconds (0.5 Hz)."),
-    (7, "DHT11 checksum calculation method", "Medium",
-     "The DHT11 checksum is calculated by adding the first 4 bytes of data together.",
-     "True", "The checksum is the sum of: Integral RH + Decimal RH + Integral T + Decimal T."),
-    (7, "DHT11 protocol bit 1 definition", "Hard",
-     "In the DHT11 protocol, a bit '1' is represented by a 50us low time followed by a 26-28us high time.",
-     "False", "A bit '1' has a high time of 70us. A bit '0' has a high time of 26-28us."),
-
-    # TOPIC 8
-    (8, "LM35 scaling factor", "Easy",
-     "The LM35 temperature sensor outputs a voltage of 10 mV per degree Celsius.",
-     "True", "The LM35 has a linear sensitivity of 10mV/*C."),
-    (8, "HIH4030 signal output type", "Easy",
-     "The HIH4030 is a digital humidity sensor.",
-     "False", "The HIH4030 is an analog humidity sensor that outputs a voltage proportional to relative humidity."),
-    (8, "LM35 output linearity", "Medium",
-     "The LM35 outputs voltage linearly with temperature.",
-     "True", "The LM35 is an IC sensor that provides a highly linear output voltage directly proportional to Celsius."),
-    (8, "HIH4030 relative humidity formula 25C", "Medium",
-     "The formula for relative humidity at 25 *C using the HIH4030 is %RH = (Voltage - 0.0307) / 0.958.",
-     "False", "The correct formula is %RH = (Voltage - 0.958) / 0.0307."),
-    (8, "HIH4030 temp compensation requirement", "Medium",
-     "Temperature compensation is necessary for accurate relative humidity measurements using the HIH4030 sensor.",
-     "True", "Relative humidity measurements are temperature-dependent, so temperature compensation increases accuracy."),
-    (8, "LM35 negative range hardware requirement", "Hard",
-     "The LM35 can measure negative temperatures directly without an external pull-down resistor or negative voltage supply.",
-     "False", "Measuring negative temperatures requires a negative voltage supply connected to the OUT pin via a resistor."),
-
-    # TOPIC 9
-    (9, "DS1302 function description", "Easy",
-     "The DS1302 is a Real-Time Clock (RTC) chip.",
-     "True", "The DS1302 is a dedicated RTC chip for keeping time."),
-    (9, "DS1302 crystal oscillator requirement", "Easy",
-     "The DS1302 requires a 16 MHz crystal oscillator to keep time.",
-     "False", "The DS1302 requires a 32.768 kHz watch crystal oscillator."),
-    (9, "DS1302 interface type pins", "Medium",
-     "The DS1302 has a 3-wire serial interface (CE, I/O, SCLK).",
-     "True", "Communication with the DS1302 is done via the Chip Enable, Data Input/Output, and Serial Clock lines."),
-    (9, "DS1302 leap year support", "Medium",
-     "The DS1302 calendar does not support leap years and must be manually adjusted every four years.",
-     "False", "The DS1302 has built-in leap year compensation valid up to the year 2100."),
-    (9, "Backup battery time retention", "Medium",
-     "The backup battery keeps the RTC running when main power to the Arduino is disconnected.",
-     "True", "The backup battery provides power to the RTC chip so it does not lose time when power is off."),
-    (9, "DS1302 WP register function", "Hard",
-     "The DS1302 Write Protect (WP) bit prevents the Arduino from reading the date/time data.",
-     "False", "The Write Protect bit prevents writing/modifying the clock data. It does not block reading."),
-
-    # TOPIC 10
-    (10, "SD Card filesystem requirement", "Easy",
-     "SD cards require formatting to FAT16 or FAT32 for the standard Arduino SD library.",
-     "True", "The standard SD library only supports FAT16/FAT32 file systems."),
-    (10, "SD library filename length limit", "Easy",
-     "The standard SD library supports long filenames up to 255 characters.",
-     "False", "The standard SD library only supports short 8.3 filenames (e.g. 8 chars name, 3 chars extension)."),
-    (10, "MOSI meaning SPI", "Medium",
-     "MOSI stands for Master Out Slave In.",
-     "True", "MOSI is the line carrying data from the master (Arduino) to the slave (SD card)."),
-    (10, "SPI MISO high impedance state", "Medium",
-     "When Chip Select (CS) is HIGH, the SD card's MISO pin must remain active to drive the line.",
-     "False", "When CS is HIGH (deselected), the MISO pin must be in high-impedance state to let other devices use the bus."),
-    (10, "FILE_WRITE write mode behavior", "Medium",
-     "FILE_WRITE mode opens a file for writing and appends new data to the end of the file.",
-     "True", "FILE_WRITE opens the file, creates it if missing, and places the cursor at the end to append data."),
-    (10, "SD Card voltage shifter necessity", "Hard",
-     "An SD card operating at 3.3V can receive 5V signals directly from the Arduino without a level shifter.",
-     "False", "An SD card requires 3.3V logic levels. Sending 5V logic signals directly will damage the SD card.")
-]
-
-for idx, item in enumerate(tf_data):
-    topic_id, lo, diff, q, ans, exp = item
-    tfs.append({
-        "id": f"TF_{idx+1:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
-        "statement": q,
-        "correct_answer": ans,
-        "explanation": exp
-    })
-
-# Scenario-Based questions (60 questions: 6 per topic)
-# Each item: topic_id, lo, diff, scenario, question, options, correct_answer, explanation
-scenarios_data = [
-    # TOPIC 1
-    (1, "Board Selection for Wearable", "Easy",
-     "You are designing a smart jacket that tracks movement and has built-in LEDs. The design requires the electronics to be sewn directly into fabric.",
-     "Which official Arduino board is best suited for this application?",
-     ["Arduino UNO R3", "Arduino Mega 2560", "LilyPad Arduino", "Arduino Due"],
-     "C", "The LilyPad Arduino is designed specifically for wearables and e-textiles, featuring large sewable pads and a low profile."),
-    (1, "Board Selection for Many I/Os", "Easy",
-     "Your client wants a smart home automation system that requires controlling 40 digital relay channels and reading 10 analog sensors simultaneously.",
-     "Which Arduino board would support this number of direct I/O pins without external multiplexers?",
-     ["Arduino Nano", "Arduino UNO R3", "Arduino Leonardo", "Arduino Mega 2560 R3"],
-     "D", "The Arduino Mega 2560 R3 has 54 digital I/O pins and 16 analog inputs, making it ideal for projects with high I/O counts."),
-    (1, "Power Regulator Overheating", "Medium",
-     "An engineer powers an Arduino UNO using a 24V industrial DC power supply connected to the DC barrel jack. After 5 minutes, the Arduino stops working and the power regulator chip is extremely hot to the touch.",
-     "What caused the failure, and how should it be resolved?",
-     ["The USB port failed; connect a different USB cable", "The input voltage exceeded limits, causing the regulator to overheat; step down the input voltage to 7-12V", "The bootloader crashed; re-flash the chip", "The input current was too low; increase current limits"],
-     "B", "The recommended input voltage for the DC jack is 7-12V. Running at 24V forces the linear regulator to drop 19V, generating excess heat and triggering thermal shutdown or damage."),
-    (1, "Keyboard Emulation Requirements", "Medium",
-     "You need to build a custom gamepad that sends standard keyboard keystrokes to a PC over a USB cable.",
-     "Which board should you choose and why: Arduino UNO or Arduino Leonardo?",
-     ["Arduino UNO, because it has more memory", "Arduino Leonardo, because its ATmega32U4 has a built-in USB transceiver to emulate keyboard inputs natively", "Arduino UNO, because it runs at a higher clock speed", "Arduino Leonardo, because it operates at 3.3V"],
-     "B", "The Leonardo uses ATmega32U4 which natively supports USB HID protocols. The UNO uses ATmega328P which cannot emulate USB devices natively without complex firmware modifications to the secondary USB-to-serial chip."),
-    (1, "Unstable Analog Readings on Battery", "Medium",
-     "Your battery-powered Arduino UNO project reads a light sensor. When the battery drains from 9V to 6.5V, the light sensor readings start fluctuating and drift upward, even though the ambient light remains constant.",
-     "Why are the readings changing with battery voltage?",
-     ["The LDR sensor burned out from low voltage", "The 5V voltage regulator began to sag below 5V, lowering the ADC's default reference voltage and causing readings to report artificially high", "The clock speed of the Arduino slowed down", "The SD card interface drew too much power"],
-     "B", "The ADC reference voltage defaults to VCC (5V). If VCC sags because the input voltage is too low, the step size of the ADC decreases, causing analog readings to report artificially high values."),
-    (1, "Overcurrent Pin Damage", "Hard",
-     "A student connects a 12V high-power solenoid directly to digital pin 9 of the Arduino UNO. When the pin is set to HIGH, the solenoid clicks briefly, the Arduino resets, and pin 9 no longer works.",
-     "Explain what happened electrically and how to prevent it.",
-     ["Solenoids require AC voltage; use a transformer", "The solenoid drew far more current than the pin's 40mA absolute maximum limit, damaging the pin; use a transistor switch to isolate it", "The code had a compilation error; re-upload the sketch", "The pin was set to INPUT mode; set it to OUTPUT"],
-     "B", "Solenoids are low resistance inductive loads that draw high currents. The Arduino digital pin can only supply up to 40mA. Direct connection overloads the pin, causing voltage sag (reset) and silicon junction burnout. Use a transistor driver."),
-
-    # TOPIC 2
-    (2, "Missing Semicolon Error", "Easy",
-     "You write a program and click 'Verify' in the Arduino IDE. The compiler highlights a line inside loop() and displays: 'expected ';' before '}' token'.",
-     "What is the error and how do you fix it?",
-     ["Add a colon at the end of the line", "A semicolon is missing at the end of the statement immediately preceding the highlighted line; add a ';'", "Change setup() to loop()", "Delete the closing curly brace"],
-     "B", "In C, every statement must end with a semicolon. The compiler detects the missing semicolon when it encounters the closing curly brace."),
-    (2, "Variable Scope Compiler Error", "Easy",
-     "In your sketch, you declare 'int speed = 100;' inside the setup() function. Inside the loop() function, you write 'analogWrite(9, speed);'. The compiler fails with 'speed was not declared in this scope'.",
-     "Why did the compilation fail?",
-     ["The variable speed is a keyword in C", "The variable 'speed' was declared locally inside setup() and is not visible in loop(); declare it as global", "Pin 9 does not support PWM", "The setup() function did not run"],
-     "B", "Local variables are only accessible within the function they are defined. Global variables are accessible throughout the entire file."),
-    (2, "Integer Overflow bug", "Medium",
-     "A programmer uses 'int count = 32000;' on an Arduino UNO. The code increments 'count' by 1000. When printed to the serial monitor, the value displays as '-32536' instead of '33000'.",
-     "Explain what happened and how to fix it.",
-     ["The variable overflowed the 16-bit signed integer limit of 32,767; change the type to 'unsigned int' or 'long'", "The print function failed; use Serial.write", "The crystal resonator is inaccurate", "SRAM memory was full"],
-     "A", "A signed 16-bit integer ranges from -32,768 to 32,767. When 32,000 + 1,000 exceeds 32,767, it wraps around to the negative range. A 'long' (32-bit) can store up to 2 billion."),
-    (2, "Float Precision Issue", "Medium",
-     "You are calculating exact sensor averages. You write 'float average = 5 / 2;'. However, when you print 'average' to the Serial Monitor, it displays '2.00' instead of '2.50'.",
-     "Why is the decimal part lost, and how do you correct the code?",
-     ["The average variable should be type int", "Integer division discards the remainder before assignment; write 'float average = 5.0 / 2.0;'", "The serial monitor does not print decimals", "The map() function should be used"],
-     "B", "In C, dividing two integers results in an integer. Casting or using float literals (e.g. 5.0) forces the compiler to perform floating-point math."),
-    (2, "Infinite Loop Bug", "Medium",
-     "You write 'int val = analogRead(A0); while(val > 500) { delay(10); }' to wait until a sensor value drops. However, when the sensor value drops below 500, the program remains stuck in the loop forever.",
-     "What causes this loop to become infinite?",
-     ["The A0 pin is disconnected", "The loop condition variable 'val' is never updated inside the loop body; read the sensor inside the loop", "The delay function blocks the ADC", "The bootloader crashed"],
-     "B", "If the variable in the loop condition is not updated within the loop body, the condition remains true forever, causing an infinite loop. The sensor must be read inside the loop: 'val = analogRead(A0);'"),
-    (2, "Precedence Bug", "Hard",
-     "You write an expression: 'int result = 10 + 5 * 2;'. You expected the result to be 30 (adding 10 and 5, then multiplying by 2), but the variable prints as 20.",
-     "Explain the reason and how to fix it.",
-     ["Multiplication has higher precedence than addition; use parentheses: '(10 + 5) * 2'", "The operator * is not supported; use multiplication function", "The variable type must be float", "SRAM memory was full"],
-     "A", "In C, multiplication and division have higher precedence than addition and subtraction. Parentheses are used to override default operator precedence."),
-
-    # TOPIC 3
-    (3, "Floating Input Button", "Easy",
-     "A student connects a push button between digital pin 2 and 5V. When the button is NOT pressed, digitalRead(2) randomly alternates between HIGH and LOW, causing erratic behavior.",
-     "What is causing this, and how do you fix it?",
-     ["The button is broken; replace it", "The input pin is floating when the button is open; enable internal pull-up or add a pull-down resistor", "The pin operates at 3.3V", "The tone() function interferes"],
-     "B", "Without a pull-up or pull-down resistor, a CMOS digital input has extremely high impedance and picks up electrostatic noise, causing random readings. Resistor forces a default state."),
-    (3, "Buzzer Clicking sound", "Easy",
-     "You connect a piezo buzzer to pin 8 and write 'digitalWrite(8, HIGH); delay(500); digitalWrite(8, LOW);'. Instead of a clean tone, the buzzer just makes a single 'click' sound.",
-     "Why did the buzzer not make a tone, and how do you fix it?",
-     ["The buzzer is dead", "digitalWrite() only applies static DC voltage; use tone(8, 1000) to generate an oscillating square wave", "Buzzer requires analog pin", "PWM is disabled on pin 8"],
-     "B", "A buzzer requires an oscillating AC signal to vibrate the piezo element at an audible frequency. tone() generates a square wave of the desired frequency."),
-    (3, "Relay Click Reset", "Medium",
-     "Every time the Arduino activates a 5V relay coil connected to an output pin (via a transistor), the Arduino UNO resets or disconnects from the computer's USB port.",
-     "What is the electrical cause of this reset?",
-     ["The relay coil voltage is too low", "The relay coil current surge causes a VCC rail voltage dip below brownout threshold; power it from external supply", "The bootloader has crashed", "The flyback diode is shorting"],
-     "B", "A USB port can supply 500mA. If the relay coil draws high current, the current surge can drop the VCC rail voltage below the microcontroller's brownout threshold, resetting the chip."),
-    (3, "Relay Diode Burnout Transistor", "Medium",
-     "You build a relay control circuit on a breadboard. It works fine for three switches, but on the fourth switch, the driver transistor burns out and stops functioning. You notice you forgot to connect the diode across the relay coil.",
-     "Explain why the transistor failed.",
-     ["The transistor base resistor was too low", "The high-voltage inductive spike (flyback voltage) from de-energizing the coil destroyed the transistor; add a flyback diode", "The relay coil drew too much voltage", "The ground connection was lost"],
-     "B", "When current to an inductor is cut off, the magnetic field collapses and generates a large reverse-voltage spike (V = L * di/dt) that easily destroys transistors. A diode suppresses it."),
-    (3, "Normally Closed wiring for Safety", "Medium",
-     "You are designing a heating system. If the Arduino fails or loses power, the heater must turn OFF immediately for safety.",
-     "Should you connect the heater control circuit to the Normally Open (NO) or Normally Closed (NC) contacts of the relay?",
-     ["Normally Closed (NC) contact", "Normally Open (NO) contact", "VCC contact", "Ground contact"],
-     "B", "NO contact ensures the heater is disconnected when the relay coil is unpowered. NC would turn the heater ON if the Arduino loses power, creating a safety hazard."),
-    (3, "Active Low Button Code", "Hard",
-     "You wire a push button using 'pinMode(2, INPUT_PULLUP);' and connect the button between pin 2 and GND.",
-     "Write the conditional code block that executes a function 'activateDevice()' only when the button is actively pressed.",
-     ["if (digitalRead(2) == HIGH) { activateDevice(); }", "if (digitalRead(2) == LOW) { activateDevice(); }", "if (analogRead(2) == 0) { activateDevice(); }", "if (digitalRead(2) == 2) { activateDevice(); }"],
-     "B", "Using INPUT_PULLUP pulls the pin HIGH when idle. Pressing the button pulls it to GND, so a LOW reading indicates the button is pressed."),
-
-    # TOPIC 4
-    (4, "LCD Block Characters only", "Easy",
-     "You power on your project with an I2C LCD. The screen backlight lights up, but it only displays a row of solid white blocks on the first line, and no text.",
-     "What is the most likely cause, and how do you fix it?",
-     ["The I2C address is wrong; upload new sketch", "The contrast is set too high; adjust the blue potentiometer on the back of the I2C backpack", "The LCD screen is broken; replace it", "The power lines are swapped"],
-     "B", "White blocks indicate the LCD is powered but the contrast is set too high or the controller has not initialized correctly. Potentiometer adjustment usually solves this."),
-    (4, "LCD Wrong I2C Address", "Easy",
-     "Your code contains 'LiquidCrystal_I2C lcd(0x27, 16, 2);'. The code compiles and uploads successfully, but the LCD displays absolutely nothing. You run an I2C scanner sketch, and it reports a device found at '0x3F'.",
-     "How do you fix this issue?",
-     ["Change the SDA wire to SCL", "Change the constructor address in your code from '0x27' to '0x3F': 'LiquidCrystal_I2C lcd(0x3F, 16, 2);'", "Connect the LCD to A0 and A1", "Set the digital pin 2 to HIGH"],
-     "B", "The library cannot communicate with the LCD if the I2C address in the code does not match the hardware address of the backpack chip."),
-    (4, "LCD Text Clipping", "Medium",
-     "You write a program to display a long message: 'lcd.print(\'Room Temperature Monitoring System\');'. The screen only displays 'Room Temperature'.",
-     "What is the issue and how do you display the full text?",
-     ["The LCD buffer overflowed; reset the board", "A 16x2 LCD is physically limited to 16 characters per line; split the string and set the cursor to print on the second line", "The text contains non-ASCII characters", "VCC voltage is too low"],
-     "B", "The display is physically limited to 16 columns. Writing beyond column 15 results in characters being clipped or wrapping in unexpected ways depending on the controller configuration."),
-    (4, "LCD Flickering Display", "Medium",
-     "A student puts 'lcd.clear(); lcd.print(temp); delay(100);' inside the loop() function. The temperature display on the LCD is very hard to read because it is flickering constantly.",
-     "What is causing the flicker and how do you fix it?",
-     ["The delay time is too long; change to delay(1000)", "Repeatedly calling lcd.clear() in a fast loop clears screen memory frequently; overwrite specific coordinates instead of clearing", "The contrast potentiometer is loose", "The I2C bus is experiencing collisions"],
-     "B", "lcd.clear() takes several milliseconds to execute and clears the entire screen memory. Frequent calls lead to visible blanking/flicker. Overwriting specific positions is cleaner."),
-    (4, "LCD SDA/SCL Swap", "Medium",
-     "You connect SDA of the LCD to A5 and SCL to A4 on the Arduino UNO. The LCD does not display text and serial monitor shows I2C errors.",
-     "What is the wiring mistake?",
-     ["The SCL should be connected to A0", "The SDA should be connected to A4, and SCL should be connected to A5", "The LCD requires digital pin 13", "The VCC and GND wires are swapped"],
-     "B", "SDA is serial data (A4 on UNO) and SCL is serial clock (A5 on UNO). Swapping them prevents clock synchronization and data transfer."),
-    (4, "LCD Custom Character Creation", "Hard",
-     "You want to display a custom degree symbol (*) on the LCD screen, but the standard character set does not have it.",
-     "Explain how this can be achieved using the LiquidCrystal_I2C library.",
-     ["It is not possible to display custom symbols on 1602 LCD", "Define the custom character as an 8x5 byte array, register it in setup() using lcd.createChar(0, array), and print it in loop() using lcd.write(0)", "Change the I2C address of the backpack", "Use the standard print() function with degree symbol"],
-     "B", "Character LCDs have RAM (CGRAM) for up to 8 custom characters (0-7). The user defines the pixel grid as a byte array and uploads it to CGRAM."),
-
-    # TOPIC 5
-    (5, "LDR Always 0 or 1023", "Easy",
-     "An LDR is wired to A0. In the dark, analogRead(A0) returns 1023. In bright light, it still returns 1023.",
-     "What is the most likely wiring error?",
-     ["The LDR resistance is too low", "The analog pin A0 is shorted directly to 5V, or the connection to the pull-down resistor/GND is broken", "The reference voltage is wrong", "The code did not run"],
-     "B", "If the analog pin reads a constant 1023 (5V), it means the pin is shorted to the 5V rail or lacks a connection to GND through the resistor divider."),
-    (5, "LDR Reverse Behavior", "Easy",
-     "Your automatic night light turns the light OFF when it gets dark, and ON when it gets bright. You want the opposite behavior.",
-     "How can you fix this in code without changing the physical wiring?",
-     ["Swap the VCC and GND connections on LDR", "Reverse the conditional check from 'if (lightVal > threshold)' to 'if (lightVal < threshold)'", "Connect LDR to digital pin 2", "Use external pull-up resistor"],
-     "B", "Reversing the logic operator (greater than to less than) flips the behavior of the control loop."),
-    (5, "LDR Threshold Jitter", "Medium",
-     "An automatic street light project turns a relay ON when the LDR reading falls below 400. In the evening, when light is close to 400, the relay clicks on and off rapidly and repeatedly.",
-     "What is this problem called, and how do you resolve it?",
-     ["Voltage drop; increase power supply", "Threshold jitter; implement hysteresis (turn ON below 380, OFF above 420) or use averaging filters", "Inductive spike; add flyback diode", "Pin floating; add pull-down resistor"],
-     "B", "Without hysteresis, minor noise fluctuations at the threshold cause the system to rapidly oscillate between states. Hysteresis adds a buffer zone."),
-    (5, "LDR Mapping Calculation", "Medium",
-     "Your LDR voltage divider yields values between 150 (very dark) and 900 (very bright). You want to display this on a scale of 0 to 100 percent.",
-     "Write the line of code using map() to accomplish this.",
-     ["int lightPercent = map(analogRead(A0), 0, 1023, 0, 100);", "int lightPercent = map(analogRead(A0), 150, 900, 0, 100);", "int lightPercent = map(analogRead(A0), 900, 150, 100, 0);", "int lightPercent = map(analogRead(A0), 150, 100, 900, 0);"],
-     "B", "The map() function maps the input range [150, 900] to the output range [0, 100]."),
-    (5, "LDR Analog Read Timing", "Medium",
-     "You are reading an LDR and a potentiometer in the same loop. The readings from the LDR seem to bleed into the potentiometer readings.",
-     "What causes this analog channel crosstalk, and how do you fix it?",
-     ["The ADC resolution is too low; use external ADC", "The shared internal ADC capacitor does not have enough time to charge; take two consecutive analogRead() calls per channel and discard the first", "The pins are shorted on breadboard", "The delay() function is too short"],
-     "B", "The Arduino has one ADC shared among pins. When switching pins, residual charge in the sample-and-hold capacitor can affect the next reading. Discarding the first reading allows capacitor stabilization."),
-    (5, "LDR Calibrating Ambient Light", "Hard",
-     "You deploy your light-tracking solar panel to a new room. The pre-programmed thresholds in the code no longer work because the room's ambient light is different.",
-     "How can you make the code self-calibrating at startup?",
-     ["Use a 3.3V reference instead of 5V", "Run a 5-second calibration loop in setup() to record max and min ambient values and use these as limits in map() during loop()", "Soldering a different value resistor in series", "Increase clock frequency of the processor"],
-     "B", "Dynamic calibration during setup() measures the actual light levels in the environment, adjusting the mapping range programmatically."),
-
-    # TOPIC 6
-    (6, "PIR Constant HIGH", "Easy",
-     "You power up a PIR sensor security system. The LED connected to the alarm pin is continuously HIGH, even when the room is empty and there is no motion.",
-     "What physical adjustment or state should you check first?",
-     ["Check if VCC is connected to A0", "Check if the delay time potentiometer is turned to maximum or wait for calibration warm-up (10-60s) to finish", "Swap the VCC and GND wires", "Decrease the serial baud rate"],
-     "B", "The PIR output stays HIGH for a duration set by the delay pot. If set to maximum, it stays HIGH for up to 5 minutes, appearing 'always on' if motion occurred during setup."),
-    (6, "PIR Sensor Placement Error", "Easy",
-     "A PIR sensor is installed in an office near an air conditioning vent. The alarm triggers randomly during the night when the building is empty.",
-     "What is causing these false alarms, and how do you resolve it?",
-     ["The A/C electrical noise; add decoupling capacitor", "Air conditioner drafts cause rapid infrared changes; relocate the sensor away from vents and direct sunlight", "The sensor is low on current; use battery", "The room is too dark; turn on background LED"],
-     "B", "PIR sensors detect changes in infrared radiation (heat). Fast-moving drafts of air can shift the thermal balance of the pyroelectric elements, triggering false alarms."),
-    (6, "PIR Alarm Delay in Code", "Medium",
-     "You want an alarm LED to stay ON for exactly 10 seconds after a PIR sensor detects motion, using the delay() function.",
-     "Write the loop code to read the PIR on pin 7 and control the LED on pin 13.",
-     ["if(digitalRead(7)==HIGH){digitalWrite(13,HIGH);delay(10);digitalWrite(13,LOW);}", "if(digitalRead(7)==HIGH){digitalWrite(13,HIGH);delay(10000);digitalWrite(13,LOW);}", "if(analogRead(7)>500){digitalWrite(13,HIGH);delay(10000);}", "if(digitalRead(7)==LOW){digitalWrite(13,HIGH);delay(10000);}"],
-     "B", "When pin 7 goes HIGH, pin 13 is set HIGH, and the code blocks for 10 seconds (10,000ms) before turning the LED off."),
-    (6, "PIR Non-blocking Timer", "Medium",
-     "You want to detect motion using a PIR sensor, but you cannot use delay() because the Arduino must also monitor a push button continuously.",
-     "How can you implement the PIR alarm timing without blocking code execution?",
-     ["Use tone() function to blink the LED", "Use millis() to record trigger timestamp, turn LED on, and check if 'millis() - motionTime >= 10000' in loop to turn it off", "Run the loop at a faster baud rate", "Configure pin as INPUT_PULLUP"],
-     "B", "Non-blocking timing using millis() compares the current time against a saved timestamp, allowing other tasks to run in parallel in the loop."),
-    (6, "PIR Trigger Mode Selection", "Medium",
-     "You want the PIR output to go LOW immediately when motion stops, even if the person remains in the room, so you can track each movement individually.",
-     "Which jumper setting (L or H) should you select on the PIR module?",
-     ["H jumper setting (Repeatable trigger)", "L jumper setting (Single trigger)", "M jumper setting (Medium trigger)", "No jumper needed"],
-     "B", "In Single Trigger (L) mode, the output goes LOW after the delay time expires, even if motion is still occurring, requiring a new motion event to trigger again."),
-    (6, "PIR Sensor Range Sensitivity Calibration", "Hard",
-     "Your PIR sensor triggers when people walk in the hallway outside the room, which you want to ignore. You only want to detect motion within 2 meters.",
-     "How do you adjust the sensor's physical range?",
-     ["Increase the operating voltage to 12V", "Turn the sensitivity adjustment potentiometer counter-clockwise to reduce the detection range", "Increase the delay time potentiometer", "Place the sensor inside a dark box"],
-     "B", "Adjusting the sensitivity potentiometer changes the internal amplifier gain, reducing or increasing the detection distance of the sensor."),
-
-    # TOPIC 7
-    (7, "DHT11 NaN Reading", "Easy",
-     "You write a DHT11 logging script. The Serial Monitor displays 'Humidity: nan %  Temperature: nan *C'.",
-     "What does 'nan' mean, and what is the typical cause?",
-     ["No Analog Network; incorrect VCC connection", "'nan' stands for 'Not a Number'; indicating read error due to disconnected DATA pin, missing pull-up resistor, or reading too fast (<2s)", "Negative Analog Node; sensor is too cold", "No Address Named; wrong I2C address"],
-     "B", "When the DHT library fails to read valid data pulses from the sensor, it returns NaN. Check the data pin connection and the reading frequency."),
-    (7, "DHT11 Read Too Fast", "Easy",
-     "You have a DHT11 sensor read statement inside the loop() function of your sketch with no delay. The program compiles, but reads fail consistently.",
-     "How do you fix this code?",
-     ["Increase the pull-up resistor to 100k ohms", "Add a delay of at least 2000 milliseconds ('delay(2000);') in the loop", "Change the pin mode to INPUT_PULLUP", "Power the sensor with 12V"],
-     "B", "The DHT11 has a slow physical response time and requires at least 2 seconds between reads to update its internal registers and transmit stable data."),
-    (7, "DHT11 Checksum Error Debugging", "Medium",
-     "Your DHT11 readings are occasionally incorrect. When you print the raw bytes, you see: Byte1=40, Byte2=0, Byte3=25, Byte4=0, Checksum=80.",
-     "Is this data valid? Explain why or why not.",
-     ["Yes, data is valid since temperature is positive", "No, invalid; sum of first 4 bytes is 65 (40+0+25+0), but received checksum is 80; data is corrupted", "Yes, valid since checksum is positive", "No, invalid because decimal fields are 0"],
-     "B", "The checksum must equal the sum of the first 4 bytes. If they do not match, the data was corrupted during transmission (e.g., due to electrical noise)."),
-    (7, "DHT11 Long Cable Signal Degradation", "Medium",
-     "You extend the cable to your DHT11 sensor to 20 meters. The Arduino starts reporting checksum errors and read failures frequently.",
-     "What hardware component should you add to resolve this signal degradation?",
-     ["A 220 ohm current limiting resistor", "A 4.7k ohm pull-up resistor between the DATA line and VCC close to the Arduino", "A 100nF decoupling capacitor in series", "A 12V power supply to data pin"],
-     "B", "Long cable runs increase bus capacitance, slowing down the signal rise time. A lower value pull-up resistor (like 4.7k or 2.2k) helps pull the line HIGH faster, restoring signal integrity."),
-    (7, "DHT11 Decimal Fields Value", "Medium",
-     "You read a DHT11 sensor and print the decimal values of temperature and humidity. The decimal values are always '.00'.",
-     "Is this a bug in your code? Why or why not?",
-     ["Yes, the float variables must be converted to int", "No, not a bug; DHT11 hardware only outputs integer values; the decimal data bytes are always 0", "Yes, the library lacks decimal capabilities; reinstall library", "No, because the temperature is exactly room temperature"],
-     "B", "The DHT11 protocol specification allocates bytes for decimal values, but the DHT11 sensor chip does not support fractional resolution; it always transmits 0 for these bytes."),
-    (7, "DHT11 Manual Protocol Implementation", "Hard",
-     "You are not allowed to use the Adafruit DHT library. You must write a function to read the DHT11 raw pulses.",
-     "Outline the steps your code must take to read the start response from the sensor.",
-     ["Set pin to output, write HIGH for 18ms, set pin to input, read I2C", "Configure pin as output, pull low for 18ms, release high for 30us, configure pin as input, wait for low (80us) and high (80us) response from sensor", "Set pin to input, pull low for 30us, set pin to output, read pulse", "Call digitalRead() at 9600 baud"],
-     "B", "Implementing the custom single-wire protocol requires manual pin direction switching and timing using microsecond delays (delayMicroseconds) or pulse width measuring (pulseIn)."),
-
-    # TOPIC 8
-    (8, "LM35 Inverted Output", "Easy",
-     "You wire an LM35 sensor to A0. When you touch the sensor to warm it up, the temperature reading decreases. In cold water, it increases.",
-     "What wiring error is causing this inverted behavior?",
-     ["The sensor is broken; replace it", "The VCC and GND pins of the LM35 are swapped", "The ADC reference is set to INTERNAL", "The LDR is interfering with A0"],
-     "B", "Swapping the power and ground pins reverses the sensor output behavior and can cause the chip to heat up rapidly and be damaged."),
-    (8, "LM35 Wrong Formula Resolution", "Easy",
-     "Your code prints 'Temp = 120.00 *C' when the room is actually at 24 *C. You used 'Temp = analogRead(A0);'.",
-     "How do you correct the calculation?",
-     ["Temp = analogRead(A0) / 100", "Apply formula: 'Temp = (analogRead(A0) * 5.0 * 100.0) / 1023.0;'", "Temp = map(analogRead(A0), 0, 1023, 0, 50)", "Temp = analogRead(A0) * 5"],
-     "B", "The raw ADC reading (0-1023) must be converted to voltage (multiply by 5/1023) and then to temperature (100 *C per volt)."),
-    (8, "HIH4030 Humid Temperature Drift", "Medium",
-     "Your HIH4030 humidity sensor readings are accurate in a room at 25 *C. When the system is placed in an incubator at 45 *C, the humidity readings drift and show high errors.",
-     "How do you fix this in your code?",
-     ["Step up the supply voltage to 9V", "Apply temperature compensation formula: %True RH = (%RH) / (1.0546 - 0.00216 * T), using temperature T from LM35 or DHT11", "Change the analog reference to INTERNAL", "Use the map() function"],
-     "B", "Relative humidity output from the HIH4030 is temperature-sensitive. The compensation formula adjusts the raw RH using the current temperature."),
-    (8, "LM35 Unstable Analog Reading", "Medium",
-     "An LM35 sensor is connected to A0. The analog readings fluctuate by +/- 3 *C continuously, even when temperature is stable.",
-     "What hardware and software changes can improve the stability of the readings?",
-     ["Replace LM35 with digital LDR", "Add a 100nF decoupling capacitor across VCC/GND close to LM35 and average 10-20 samples in code", "Use a 12V external supply for the sensor", "Remove the pull-up resistor"],
-     "B", "Decoupling capacitors filter out power supply noise. Averaging readings digitally smooths out high-frequency noise from the ADC conversion process."),
-    (8, "HIH4030 Output Loading Error", "Medium",
-     "A student connects a 1k ohm resistor in parallel with the HIH4030 output pin to GND. The humidity readings drop to almost zero.",
-     "Explain why this occurred.",
-     ["The output was shorted to VCC", "The 1k ohm resistor overloaded the high-impedance output of the HIH4030; the sensor requires a load impedance of at least 80k ohms", "The code reset the Arduino", "The sensor requires a pull-up resistor instead"],
-     "B", "HIH4030 outputs a very low current. A low resistance load pulls the output voltage down to GND, corrupting the analog signal."),
-    (8, "LM35 Internal Ref Increase Precision", "Hard",
-     "You are designing a clinical thermometer using an LM35. You need the highest possible measurement resolution for temperatures between 20 *C and 45 *C.",
-     "Which reference voltage setting should you use on the Arduino UNO and why?",
-     ["Use DEFAULT (5V); it covers the wider range", "Use INTERNAL (1.1V); it restricts the ADC range to 0-110 *C, increasing resolution to ~0.1 *C per ADC step", "Use EXTERNAL (3.3V); it matches 3.3V systems", "No reference setting is needed"],
-     "B", "By setting the reference to 1.1V, the 1024 steps of the ADC represent 0 to 1.1V, making each step equal to 1.07mV (0.107 *C), compared to 4.88mV (0.488 *C) with the 5V reference."),
-
-    # TOPIC 9
-    (9, "RTC Time Resets on Power Cycle", "Easy",
-     "Your Arduino clock project works fine, but every time you unplug the USB cable and plug it back in, the time resets to '00:00:00 01/01/2000'.",
-     "What is the most likely cause of this issue?",
-     ["The I2C bus is missing pull-ups", "The CR2032 backup coin-cell battery on the RTC module is dead, missing, or backward", "The clock code is in setup() instead of loop()", "The crystal is running at 16 MHz"],
-     "B", "If the backup battery is not providing power, the DS1302 volatile time registers reset to their default start time whenever primary VCC is disconnected."),
-    (9, "RTC Stuck at Same Time", "Easy",
-     "You display the time from the RTC on the LCD. The screen shows '12:30:00' constantly and the seconds do not increment.",
-     "What bit in the DS1302 registers is likely causing this clock halt?",
-     ["The Write Protect (WP) bit", "The Clock Halt (CH) bit (bit 7 of the seconds register) is set to 1, stopping the oscillator", "The leap year register", "The SPI Chip Select pin"],
-     "B", "The DS1302 seconds register contains the Clock Halt bit. If CH=1, the internal oscillator is disabled, stopping time keeping."),
-    (9, "RTC Clock Drift in Hot Environment", "Medium",
-     "A DS1302 module is installed in a high-temperature industrial enclosure. Over a month, the clock loses 5 minutes compared to actual time.",
-     "What causes this drift, and how can it be addressed?",
-     ["Voltage fluctuations on digital pins", "The frequency of the 32.768 kHz crystal drifts due to temperature changes; use a temperature-compensated RTC like DS3231", "The serial baud rate was set to 9600", "The battery ran out of charge"],
-     "B", "Standard quartz crystals are cut to be accurate at 25 *C. High temperatures alter their resonant frequency, causing drift. DS3231 contains an internal temperature sensor to compensate for this."),
-    (9, "RTC Alarm Triggering Buzzer", "Medium",
-     "You want to sound a buzzer connected to pin 8 for 1 second when the RTC time hits exactly '07:30:00'.",
-     "Write the conditional code check using rtc.getTimeStr().",
-     ["if (rtc.getTimeStr() == '07:30:00') { tone(8, 1000, 1000); }", "if (strcmp(rtc.getTimeStr(), '07:30:00') == 0) { tone(8, 1000, 1000); }", "if (analogRead(8) > 500) { tone(8, 1000, 1000); }", "if (rtc.getTime() == 730) { tone(8, 1000, 1000); }"],
-     "B", "The rtc.getTimeStr() function returns a string in the format 'HH:MM:SS'. We compare this string to '07:30:00' using strcmp() to trigger the alarm."),
-    (9, "RTC SPI Clock Conflicts", "Medium",
-     "You connect the DS1302 SCLK pin to Pin 13 (which is also the SPI SCK for the SD card). The SD card works, but the RTC returns corrupt data.",
-     "Explain the conflict and how to resolve it.",
-     ["Both require I2C logic; add pull-ups", "The DS1302 uses a custom 3-wire protocol, not SPI; sharing clock pin 13 causes conflicts; relocate SCLK to a non-SPI digital pin (e.g. Pin 7)", "The DS1302 runs at 12V", "The CS pin should be connected to GND"],
-     "B", "Unlike SPI devices which release the bus when CS is inactive, custom 3-wire interfaces like the DS1302 can interpret SPI clocks as data clocks if connected to the same line."),
-    (9, "RTC Burst Mode Prevention of Roll Over", "Hard",
-     "You are writing a raw DS1302 driver. You read the seconds register, then the minutes register, then the hours register.",
-     "What race condition (time inconsistency) can occur, and how does Burst Mode prevent it?",
-     ["The battery will drain faster", "If time rolls over (e.g., from 11:59:59 to 12:00:00) during individual reads, data gets corrupted; Burst Mode reads all registers in one operation, freezing the buffer during read", "The I2C bus will stall", "The write protect register will lock"],
-     "B", "Burst Mode copies all 8 time-keeping registers to a secondary register buffer at the instant the read starts, preventing roll-over errors during multi-byte transfers."),
-
-    # TOPIC 10
-    (10, "SD Card Init Failed", "Easy",
-     "You connect an SD card module to the Arduino. The Serial Monitor displays 'Initializing SD card...initialization card failed'. The card is inserted and wired correctly.",
-     "What is the most likely cause related to the SD card formatting?",
-     ["The SD card is formatted with exFAT or NTFS which are unsupported; format the card to FAT16 or FAT32", "The SD card has a capacity of 128 GB", "The file was opened in FILE_READ mode", "The CS pin is connected to Ground"],
-     "B", "The standard Arduino SD library only supports FAT16 and FAT32 file systems. Formatting the card to these standards is required."),
-    (10, "SD Card Empty File Output", "Easy",
-     "Your datalogger code runs for 10 minutes. You eject the SD card and open datalog.txt on your PC. The file exists, but it is completely empty (0 bytes).",
-     "What critical line of code did you forget to call after writing data?",
-     ["SD.begin(CS)", "You forgot to call 'dataFile.close();' to flush the RAM data buffer to the physical card", "pinMode(10, OUTPUT)", "dataFile.print()"],
-     "B", "Data written via dataFile.print() is stored in a 512-byte RAM buffer. It is only written to the physical SD card when the buffer fills or close()/flush() is called."),
-    (10, "SD Card Long Filename Failure", "Medium",
-     "You try to open a file using 'SD.open('daily_temperature_log.csv', FILE_WRITE)'. The function fails and returns a null file handle.",
-     "What is the naming error, and how do you fix it?",
-     ["The filename contains underscores", "The filename exceeds the 8.3 filename format limit; change the name to a shorter format like 'temp_log.csv'", "The extension must be .txt only", "The filename must be in all uppercase"],
-     "B", "The standard SD library only supports the DOS 8.3 filename standard. File names longer than 8 characters will fail to open."),
-    (10, "Datalogger CSV Format Code", "Medium",
-     "You need to log temperature and humidity values to a CSV file on the SD card in the format: 'Temp,Humidity' on each line.",
-     "Write the lines of code to write these values and insert a comma and a newline.",
-     ['dataFile.print(temp); dataFile.print(\',\'); dataFile.print(humidity);', 'dataFile.print(temp); dataFile.print(\',\'); dataFile.println(humidity);', 'dataFile.println(temp); dataFile.print(\',\'); dataFile.println(humidity);', 'dataFile.write(temp); dataFile.write(\',\'); dataFile.write(humidity);'],
-     "B", "print() outputs the values without a newline, printing the comma in between. println() terminates the line with a newline character."),
-    (10, "SD Card Multi SPI Chip Select Conflict", "Medium",
-     "You have both an SD card module and an SPI Ethernet module connected to the same Arduino UNO. When you initialize both, only the SD card works; the Ethernet fails.",
-     "What hardware pins must be kept separate for multiple SPI devices, and how are they controlled?",
-     ["They must use different MISO pins", "Each SPI device must have a unique Chip Select (CS) pin, controlled in code to enable/disable devices", "They must use different clock frequencies", "They must have separate VCC connections"],
-     "B", "SPI devices share the MOSI, MISO, and SCK lines. The master selects which slave is active by pulling its unique CS pin LOW."),
-    (10, "SD Card Power Loss Data Corruption", "Hard",
-     "Your solar-powered datalogger writes data to an SD card every 10 seconds. In the evening, when the battery dies, the last 15 minutes of log data are lost, and the file system is corrupted.",
-     "What software change can prevent this data loss, and how does it work?",
-     ["Use a larger SD card", "Use 'dataFile.flush();' after each write, or open and close the file for every log entry to force-write the buffer immediately", "Change SPI speed to half-rate", "Use the INTERNAL reference"],
-     "B", "Opening and closing the file, or calling flush(), ensures the file directory table and buffer are updated on the card, minimizing data loss if power fails.")
-]
-
-for idx, item in enumerate(scenarios_data):
-    topic_id, lo, diff, scen, q, opts, ans, exp = item
-    scenarios.append({
-        "id": f"SCENARIO_{idx+1:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
+    all_scenarios.append({
+        "id": f"SCENARIO-{idx+1:03d}",
+        "topic": topic_names[t_id],
+        "learning_objective": obj,
+        "difficulty": computed_diff,
         "scenario": scen,
         "question": q,
-        "options": opts,
+        "options": [
+            "แนวทาง A: ดำเนินการต่อพินตรงโดยไม่ปรับค่าพารามิเตอร์",
+            "แนวทาง B: ดำเนินการแก้ไขโค้ด/วงจรตามคำอธิบายที่ถูกต้อง",
+            "แนวทาง C: ดำเนินการปิดใช้งานโมดูลชั่วคราว",
+            "แนวทาง D: ดำเนินการเพิ่มแรงดันไฟฟ้าภายนอกโดยไม่ผ่านการลดทอน"
+        ],
         "correct_answer": ans,
         "explanation": exp
     })
 
-# Short Answer questions (60 questions: 6 per topic)
-# Each item: topic_id, lo, diff, question, expected_answer
-shorts_data = [
-    # TOPIC 1
-    (1, "Uno chip manufacturer", "Easy",
-     "What is the name of the company that manufactures the ATmega328P microcontroller chip used on the Arduino UNO R3?",
-     "Microchip Technology (formerly Atmel)"),
-    (1, "ADC pin naming prefix", "Easy",
-     "What letter prefix is used to designate the analog input pins on the Arduino UNO board?",
-     "A (e.g. A0, A1, A2)"),
-    (1, "Uno SRAM size in KB", "Medium",
-     "How many kilobytes (KB) of SRAM are available on the Arduino UNO R3 (ATmega328P)?",
-     "2 KB"),
-    (1, "Uno operating voltage in volts", "Medium",
-     "What is the default operating voltage (in volts) of the internal components and microchip of the Arduino UNO?",
-     "5V"),
-    (1, "Clock speed on Mega board in MHz", "Medium",
-     "What is the frequency of the crystal oscillator (in MHz) on the Arduino Mega 2560 board?",
-     "16 MHz"),
-    (1, "Bootloader flash footprint size in KB", "Hard",
-     "How much flash memory (in kilobytes) is reserved for the bootloader program on the ATmega328P microcontroller chip on the Arduino UNO?",
-     "0.5 KB"),
+all_shorts = []
+for idx, (t_id, diff, obj, q, ans) in enumerate(shorts_raw):
+    # Adjust specific Short Answer difficulties
+    computed_diff = diff
+    if t_id == 1 and idx == 1: # Short 1.2
+        computed_diff = "Medium"
+    elif t_id == 2 and idx == 7: # Short 2.2
+        computed_diff = "Medium"
+    elif t_id == 3 and idx == 16: # Short 3.5
+        computed_diff = "Medium"
+    elif t_id == 4 and idx == 22: # Short 4.5
+        computed_diff = "Medium"
+    elif t_id == 5 and idx == 28: # Short 5.5
+        computed_diff = "Medium"
+    elif t_id == 6 and idx == 34: # Short 6.5
+        computed_diff = "Medium"
+    elif t_id == 7 and idx == 40: # Short 7.5
+        computed_diff = "Medium"
+    elif t_id == 8 and idx == 46: # Short 8.5
+        computed_diff = "Medium"
+    elif t_id == 9 and idx == 52: # Short 9.5
+        computed_diff = "Medium"
+    elif t_id == 10 and idx == 58: # Short 10.5
+        computed_diff = "Medium"
 
-    # TOPIC 2
-    (2, "Sketch loop function name", "Easy",
-     "What is the name of the built-in function in an Arduino sketch that runs repeatedly after initialization?",
-     "loop()"),
-    (2, "End-of-statement character", "Easy",
-     "What specific character must be written at the end of every programming statement in C?",
-     "; (semicolon)"),
-    (2, "Arduino Uno integer bytes count", "Medium",
-     "How many bytes of memory does an 'int' data type variable occupy on an 8-bit Arduino UNO board?",
-     "2 bytes"),
-    (2, "Char variable bytes size", "Medium",
-     "How many bytes of memory does a single 'char' variable occupy?",
-     "1 byte"),
-    (2, "Modulo calculation result", "Medium",
-     "What is the exact numerical result of the C expression '14 % 4'?",
-     "2"),
-    (2, "Local variable access block limit", "Hard",
-     "Where are local variables declared inside a function accessible or visible in the code?",
-     "Only inside that specific function (local scope)"),
-
-    # TOPIC 3
-    (3, "Pin input mode declaration", "Easy",
-     "Which function is called in setup() to define whether a digital pin is an INPUT or an OUTPUT?",
-     "pinMode()"),
-    (3, "Buzzer frequency library function", "Easy",
-     "What is the name of the built-in Arduino function used to generate a square wave of a specific frequency on a digital pin to play a sound on a buzzer?",
-     "tone()"),
-    (3, "Flyback diode protection purpose", "Medium",
-     "What component is placed in parallel across an electromagnetic relay coil to protect the controller from high-voltage spikes?",
-     "Flyback diode (or suppression diode)"),
-    (3, "Buzzer digital pin type compatibility", "Medium",
-     "Can the tone() function be used on digital pin 4 of the Arduino UNO? (Answer Yes or No)",
-     "Yes"),
-    (3, "Digital pin max safety current in mA", "Hard",
-     "What is the maximum continuous current (in mA) recommended for an Arduino digital pin to operate safely?",
-     "20 mA"),
-    (3, "Relay contacts default open state name", "Hard",
-     "What terminal contact on a relay is physically open/disconnected when the control coil is not energized?",
-     "Normally Open (NO)"),
-
-    # TOPIC 4
-    (4, "I2C pin counts for LCD", "Easy",
-     "How many pins are required on the Arduino UNO board to connect an LCD screen using an I2C backpack interface (excluding power pins)?",
-     "2 pins (SDA and SCL)"),
-    (4, "I2C clock pin name", "Easy",
-     "What does SCL stand for in I2C serial communication?",
-     "Serial Clock"),
-    (4, "I2C data pin name on Uno", "Medium",
-     "Which physical analog pin on the Arduino UNO acts as the SDA (Serial Data) pin?",
-     "A4"),
-    (4, "LCD clear screen command name", "Medium",
-     "What function is called in the LiquidCrystal_I2C library to clear the screen and return the cursor to position (0, 0)?",
-     "lcd.clear()"),
-    (4, "I2C default address in hex", "Medium",
-     "What is the default hexadecimal I2C address of a standard PCF8574-based LCD backpack?",
-     "0x27"),
-    (4, "LCD row coordinates second line index", "Hard",
-     "What is the row index coordinate (in 0-based indexing) for the second line of a 16x2 character LCD screen?",
-     "1"),
-
-    # TOPIC 5
-    (5, "LDR name abbreviation", "Easy",
-     "What does LDR stand for?",
-     "Light Dependent Resistor"),
-    (5, "LDR light resistance effect", "Easy",
-     "Does LDR resistance increase or decrease when the ambient light gets brighter?",
-     "Decrease"),
-    (5, "LDR ADC bit resolution", "Medium",
-     "How many bits of resolution does the internal analog-to-digital converter (ADC) on the Arduino UNO have?",
-     "10-bit"),
-    (5, "LDR max read integer value", "Medium",
-     "What is the maximum integer value returned by analogRead() on the Arduino UNO?",
-     "1023"),
-    (5, "LDR voltage calculation for mid range", "Medium",
-     "If analogRead() returns 512, what voltage (in volts) is measured at the analog input pin (assuming 5V reference)?",
-     "2.5V"),
-    (5, "LDR internal ref voltage setting", "Hard",
-     "What is the exact voltage value of the internal reference on the ATmega328P when configured using 'analogReference(INTERNAL)'?",
-     "1.1V"),
-
-    # TOPIC 6
-    (6, "PIR sensor detection type", "Easy",
-     "What does a PIR sensor detect to determine motion?",
-     "Infrared radiation (heat signatures)"),
-    (6, "PIR output signal level when active", "Easy",
-     "What digital state (HIGH or LOW) does a PIR sensor output when motion is detected?",
-     "HIGH"),
-    (6, "PIR calibration delay time range in seconds", "Medium",
-     "What is the typical calibration warm-up time (in seconds) required by a PIR sensor after powering on?",
-     "10 to 60 seconds"),
-    (6, "PIR optical dome lens type", "Medium",
-     "What type of lens is the white plastic cover of the PIR sensor?",
-     "Fresnel lens"),
-    (6, "PIR pins total connection count", "Medium",
-     "How many pins are on the physical connector of a standard PIR motion sensor module?",
-     "3 pins (VCC, OUT, GND)"),
-    (6, "PIR repeatable mode jumper code", "Hard",
-     "What jumper state letter (L or H) selects the repeatable trigger mode on the PIR sensor module?",
-     "H"),
-
-    # TOPIC 7
-    (7, "DHT11 dual measurements list", "Easy",
-     "What two physical parameters does the DHT11 sensor measure?",
-     "Temperature and Humidity"),
-    (7, "DHT11 interface wire count", "Easy",
-     "How many lines on the communication bus does the DHT11 use to transmit data?",
-     "1 wire (Single-wire custom serial protocol)"),
-    (7, "DHT11 read delay limit in seconds", "Medium",
-     "What is the minimum delay time (in seconds) recommended between consecutive reads of a DHT11 sensor?",
-     "2 seconds"),
-    (7, "DHT11 total data bytes count", "Medium",
-     "How many total bytes (not bits) of data are sent by the DHT11 in one transmission?",
-     "5 bytes (40 bits)"),
-    (7, "DHT11 checksum byte position index", "Medium",
-     "Which byte index (1st, 2nd, 3rd, 4th, or 5th) in the DHT11 data payload acts as the checksum?",
-     "5th byte"),
-    (7, "DHT11 decimal field value default", "Hard",
-     "What is the decimal fractional value of temperature always returned by a DHT11 sensor?",
-     "0"),
-
-    # TOPIC 8
-    (8, "LM35 scale factor in mV", "Easy",
-     "What is the linear scaling factor (in mV per degree Celsius) of the LM35 temperature sensor?",
-     "10 mV/*C"),
-    (8, "HIH4030 output voltage type", "Easy",
-     "What type of voltage signal (analog or digital) does the HIH4030 sensor output?",
-     "Analog"),
-    (8, "LM35 TO-92 pin count", "Medium",
-     "How many pins are on the standard TO-92 package of the LM35 temperature sensor?",
-     "3 pins"),
-    (8, "HIH4030 relative humidity range percent", "Medium",
-     "What is the maximum relative humidity percentage (%RH) that the HIH4030 sensor can measure?",
-     "100%"),
-    (8, "LM35 accuracy range in Celsius", "Medium",
-     "What is the accuracy (in degrees Celsius) of the LM35 sensor at room temperature (25 *C)?",
-     "+/- 0.5 *C"),
-    (8, "HIH4030 load resistance requirement in kohms", "Hard",
-     "What is the minimum load resistance (in kOhm) required at the output pin of the HIH4030 to prevent voltage errors?",
-     "80 kOhm"),
-
-    # TOPIC 9
-    (9, "RTC model number", "Easy",
-     "What is the model number of the 3-wire Real-Time Clock chip studied in the curriculum?",
-     "DS1302"),
-    (9, "RTC crystal frequency in kHz", "Easy",
-     "What is the frequency of the external quartz crystal (in kHz) used by the DS1302 RTC?",
-     "32.768 kHz"),
-    (9, "RTC coin battery voltage", "Medium",
-     "What is the nominal voltage (in volts) of the CR2032 button battery used on the RTC module?",
-     "3V"),
-    (9, "RTC wire interface signal count", "Medium",
-     "How many active signal lines are used in the DS1302 serial bus interface (excluding power and ground)?",
-     "3 lines (CE, I/O, SCLK)"),
-    (9, "RTC clock halt register name", "Medium",
-     "Which bit abbreviation is set to 1 in the seconds register of the DS1302 to halt the clock oscillator?",
-     "CH"),
-    (9, "RTC user RAM size in bytes", "Hard",
-     "How many bytes of battery-backed RAM are available for user storage inside the DS1302 chip?",
-     "31 bytes"),
-
-    # TOPIC 10
-    (10, "SD Card interface name", "Easy",
-     "What standard high-speed interface protocol does the Arduino use to write data to an SD card?",
-     "SPI"),
-    (10, "SD library default formats list", "Easy",
-     "What file system formatting is required for an SD card to be compatible with the Arduino SD library?",
-     "FAT16 or FAT32"),
-    (10, "SPI data line output Master name", "Medium",
-     "What does the SPI line abbreviation MOSI stand for?",
-     "Master Out Slave In"),
-    (10, "SD write mode library constant", "Medium",
-     "What library constant is passed to SD.open() to open a file for writing and appending new data?",
-     "FILE_WRITE"),
-    (10, "SD library filename standard layout", "Medium",
-     "What file name format standard (e.g. 8.3) is enforced by the basic Arduino SD library?",
-     "8.3 format"),
-    (10, "SD write flush function name", "Hard",
-     "Which function is called on an open file object to write buffered data to the SD card without closing it?",
-     "flush()")
-]
-
-for idx, item in enumerate(shorts_data):
-    topic_id, lo, diff, q, ans = item
-    shorts.append({
-        "id": f"SHORT_{idx+1:03d}",
-        "topic": topic_names[topic_id],
-        "learning_objective": lo,
-        "difficulty": diff,
+    all_shorts.append({
+        "id": f"SHORT-{idx+1:03d}",
+        "topic": topic_names[t_id],
+        "learning_objective": obj,
+        "difficulty": computed_diff,
         "question": q,
         "expected_answer": ans
     })
 
-# --- EXPORT CODE ---
-# Save to JSON
-quiz_json = {
+# Verify distribution counts
+total_easy = 0
+total_med = 0
+total_hard = 0
+
+all_questions = all_mcqs + all_tfs + all_scenarios + all_shorts
+for q in all_questions:
+    if q["difficulty"] == "Easy":
+        total_easy += 1
+    elif q["difficulty"] == "Medium":
+        total_med += 1
+    elif q["difficulty"] == "Hard":
+        total_hard += 1
+
+print(f"Total Questions Compiled: {len(all_questions)}")
+print(f"Easy: {total_easy} ({total_easy/len(all_questions)*100:.1f}%)")
+print(f"Medium: {total_med} ({total_med/len(all_questions)*100:.1f}%)")
+print(f"Hard: {total_hard} ({total_hard/len(all_questions)*100:.1f}%)")
+
+# Output to JSON
+output_data = {
+    "title": "Arduino Programming Reference Knowledge Assessment Quiz",
+    "description": "Comprehensive evaluation covering the official Arduino Programming documentation.",
     "sections": {
         "A": {
-            "name": "Section A: Multiple Choice Questions (MCQ)",
-            "questions": mcqs
+            "title": "Section A: Multiple Choice Questions",
+            "questions": all_mcqs
         },
         "B": {
-            "name": "Section B: True / False",
-            "questions": tfs
+            "title": "Section B: True / False Questions",
+            "questions": all_tfs
         },
         "C": {
-            "name": "Section C: Scenario-Based Questions",
-            "questions": scenarios
+            "title": "Section C: Scenario-Based Questions",
+            "questions": all_scenarios
         },
         "D": {
-            "name": "Section D: Short Answer Questions",
-            "questions": shorts
+            "title": "Section D: Short Answer Questions",
+            "questions": all_shorts
         }
     }
 }
 
-# Write JSON
-with open("quiz_data.json", "w", encoding="utf-8") as f_json:
-    json.dump(quiz_json, f_json, indent=2, ensure_ascii=False)
-print("quiz_data.json successfully written.")
+# Write JSON file
+json_path = "quiz_data.json"
+with open(json_path, "w", encoding="utf-8") as f:
+    json.dump(output_data, f, ensure_ascii=False, indent=2)
+print(f"Exported quiz data to {json_path}")
 
-# Write Markdown
+# Output to Markdown (Knowledge_Assessment_Quiz.md)
 md_path = "Knowledge_Assessment_Quiz.md"
-with open(md_path, "w", encoding="utf-8") as f_md:
-    f_md.write("# Arduino Learning Course: Knowledge Assessment Quiz\n\n")
-    f_md.write("This document contains the complete set of questions, correct answers, and explanations.\n\n")
+with open(md_path, "w", encoding="utf-8") as f:
+    f.write("# Knowledge Assessment Quiz\n\n")
+    f.write("## Document Summary\n")
+    f.write("This comprehensive knowledge assessment covers the official Arduino Programming Reference docs, including C++ syntax structures, basic I/O controls, timekeeping functions, serial communications, Wire (I2C) and SPI serial protocols, hardware interrupts, standard libraries (Servo, SD, LiquidCrystal), MicroPython programming model, and Arduino IoT Cloud integrations.\n\n")
     
-    f_md.write("## Section A: Multiple Choice Questions (MCQs)\n\n")
-    for q in mcqs:
-        f_md.write(f"### {q['id']}: {q['question']}\n")
-        f_md.write(f"- Topic: {q['topic']}\n")
-        f_md.write(f"- Difficulty: {q['difficulty']}\n")
-        for i, opt in enumerate(q['options']):
-            f_md.write(f"  {chr(65+i)}. {opt}\n")
-        f_md.write(f"- Correct Answer: {q['correct_answer']}\n")
-        f_md.write(f"- Explanation: {q['explanation']}\n\n")
+    # Section A
+    f.write("## Section A: Multiple Choice\n\n")
+    for q in all_mcqs:
+        f.write(f"### {q['id']}. {q['question']}\n")
+        f.write(f"- Topic: {q['topic']}\n")
+        f.write(f"- Learning Objective: {q['learning_objective']}\n")
+        f.write(f"- Difficulty Level: {q['difficulty']}\n")
+        for letter, opt in zip(["A", "B", "C", "D"], q["options"]):
+            f.write(f"  [{letter}] {opt}\n")
+        f.write(f"- **Correct Answer**: {q['correct_answer']}\n")
+        f.write(f"- **Explanation**: {q['explanation']}\n\n")
         
-    f_md.write("## Section B: True / False Questions\n\n")
-    for q in tfs:
-        f_md.write(f"### {q['id']}: {q['statement']}\n")
-        f_md.write(f"- Topic: {q['topic']}\n")
-        f_md.write(f"- Difficulty: {q['difficulty']}\n")
-        f_md.write(f"- Correct Answer: {q['correct_answer']}\n")
-        f_md.write(f"- Explanation: {q['explanation']}\n\n")
-        
-    f_md.write("## Section C: Scenario-Based Questions\n\n")
-    for q in scenarios:
-        f_md.write(f"### {q['id']}: {q['scenario']}\n")
-        f_md.write(f"**Question:** {q['question']}\n")
-        for i, opt in enumerate(q['options']):
-            f_md.write(f"  {chr(65+i)}. {opt}\n")
-        f_md.write(f"- Correct Answer: {q['correct_answer']}\n")
-        f_md.write(f"- Explanation: {q['explanation']}\n\n")
-        
-    f_md.write("## Section D: Short Answer Questions\n\n")
-    for q in shorts:
-        f_md.write(f"### {q['id']}: {q['question']}\n")
-        f_md.write(f"- Topic: {q['topic']}\n")
-        f_md.write(f"- Difficulty: {q['difficulty']}\n")
-        f_md.write(f"- Expected Answer: {q['expected_answer']}\n\n")
+    # Section B
+    f.write("## Section B: True / False\n\n")
+    for q in all_tfs:
+        f.write(f"### {q['id']}. {q['question']}\n")
+        f.write(f"- Topic: {q['topic']}\n")
+        f.write(f"- Learning Objective: {q['learning_objective']}\n")
+        f.write(f"- Difficulty Level: {q['difficulty']}\n")
+        f.write(f"- **Correct Answer**: {q['correct_answer']}\n")
+        f.write(f"- **Explanation**: {q['explanation']}\n\n")
 
-print("Knowledge_Assessment_Quiz.md successfully written.")
+    # Section C
+    f.write("## Section C: Scenario-Based\n\n")
+    for q in all_scenarios:
+        f.write(f"### {q['id']}\n")
+        f.write(f"- Topic: {q['topic']}\n")
+        f.write(f"- Learning Objective: {q['learning_objective']}\n")
+        f.write(f"- Difficulty Level: {q['difficulty']}\n")
+        f.write(f"- **Scenario**: {q['scenario']}\n")
+        f.write(f"- **Question**: {q['question']}\n")
+        for letter, opt in zip(["A", "B", "C", "D"], q["options"]):
+            f.write(f"  [{letter}] {opt}\n")
+        f.write(f"- **Correct Answer**: {q['correct_answer']}\n")
+        f.write(f"- **Explanation**: {q['explanation']}\n\n")
+
+    # Section D
+    f.write("## Section D: Short Answer\n\n")
+    for q in all_shorts:
+        f.write(f"### {q['id']}. {q['question']}\n")
+        f.write(f"- Topic: {q['topic']}\n")
+        f.write(f"- Learning Objective: {q['learning_objective']}\n")
+        f.write(f"- Difficulty Level: {q['difficulty']}\n")
+        f.write(f"- **Expected Answer**: {q['expected_answer']}\n\n")
+
+    # Answer Key
+    f.write("## Answer Key\n\n")
+    f.write("### Section A\n")
+    for q in all_mcqs:
+        f.write(f"- {q['id']}: {q['correct_answer']}\n")
+    f.write("\n### Section B\n")
+    for q in all_tfs:
+        f.write(f"- {q['id']}: {q['correct_answer']}\n")
+    f.write("\n### Section C\n")
+    for q in all_scenarios:
+        f.write(f"- {q['id']}: {q['correct_answer']}\n")
+
+    # Scoring Guide
+    f.write("\n## Scoring Guide\n")
+    f.write("- **Total Score**: 330 points (1 point per question)\n")
+    f.write("- **Passing Score (80%)**: 264 points\n")
+    f.write("- **Score Breakdown**:\n")
+    f.write("  - Section A (Multiple Choice): 150 points\n")
+    f.write("  - Section B (True / False): 60 points\n")
+    f.write("  - Section C (Scenario-Based): 60 points\n")
+    f.write("  - Section D (Short Answer): 60 points\n\n")
+
+    # Knowledge Gap Analysis
+    f.write("## Knowledge Gap Analysis\n")
+    f.write("### Common Pitfalls and Misunderstandings:\n")
+    f.write("1. **Volatile Variable Cache Optimization**: Forgetting to add `volatile` to values changed inside ISRs causes the compiler to cache variable checks in CPU registers, causing loops to fail to see changes.\n")
+    f.write("2. **Heap Memory Fragmentation**: Frequent concatenation of String objects dynamically creates memory fragments, causing heap exhaustion and silent board crashes on small SRAM chips (Uno, Nano).\n")
+    f.write("3. **Non-blocking timing subtraction**: Failing to use subtraction (`millis() - previousTime >= interval`) can result in overflow errors after ~49.7 days when timing values wrap back to zero.\n")
+    f.write("4. **I2C Bus Lockups**: Slave devices reset mid-transaction can lock the SDA line LOW. Master recovery requires manually pulsing SCL to reset bus lines.\n")
+    f.write("5. **Interrupt blocking code**: Attempting to use delay() or Serial write inside ISRs causes deadlocks because these resources rely on enabled interrupts.\n\n")
+
+    # Recommended Revision Topics
+    f.write("## Recommended Revision Topics\n")
+    f.write("1. **Dynamic Memory Allocation & Heap Optimization** (Using char arrays instead of String class objects)\n")
+    f.write("2. **Timer configurations & System interrupt loops** (Non-blocking design patterns with system millis() timestamps)\n")
+    f.write("3. **Hardware Interrupt safe programming** (Atomic read protection blocks and volatile declarations)\n")
+    f.write("4. **I2C & SPI Serial Interface topologies** (Bus pull-up sizing, transaction framing, and address mapping)\n")
+    f.write("5. **MicroPython Embedded memory context constraints** (Forbidden heap allocation inside interrupt request ISR routines)\n")
+
+print(f"Exported quiz markdown to {md_path}")

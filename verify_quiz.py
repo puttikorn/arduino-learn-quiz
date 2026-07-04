@@ -64,7 +64,7 @@ def main():
     # Check fields for T/Fs
     for idx, q in enumerate(tfs):
         q_id = q.get("id", f"TF_INDEX_{idx}")
-        required_fields = ["id", "topic", "learning_objective", "difficulty", "statement", "correct_answer", "explanation"]
+        required_fields = ["id", "topic", "learning_objective", "difficulty", "question", "correct_answer", "explanation"]
         for field in required_fields:
             if field not in q or not q[field]:
                 errors.append(f"{q_id} is missing field: {field}")
