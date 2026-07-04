@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arduino Knowledge Assessment Quiz</title>
+  <meta name="description" content="An interactive quiz application to review, reinforce, and evaluate understanding of basic Arduino concepts.">
+  <link rel="icon" type="image/svg+xml" href="/arduino-learn-quiz/favicon.svg" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script type="module" crossorigin src="/arduino-learn-quiz/assets/index-CxoQGywJ.js"></script>
+</head>
+<body class="dark-theme">
+  <div id="app">
+    <header class="app-header">
+      <div class="header-container">
+        <div class="logo">
+          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect width="24" height="24" rx="6" fill="url(#grad)" />
+            <path d="M7 12H17M12 7V17" stroke="white" stroke-width="2.5" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#00bcd4" />
+                <stop offset="1" stop-color="#009688" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="logo-text">
+            <h1>Arduino Master Quiz</h1>
+            <span>Knowledge Assessment Platform</span>
+          </div>
+        </div>
+        <div class="theme-toggle">
+          <button id="toggle-theme-btn" aria-label="Toggle Theme">
+            <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <!-- Welcome/Dashboard screen -->
+      <section id="screen-dashboard" class="screen active">
+        <div class="dashboard-hero">
+          <h2>Test Your Arduino Capabilities</h2>
+          <p>Evaluate your skills across 330 questions on Arduino UNO hardware, programming syntax, sensors, I2C, RTC, and SD card data logging. Aim for the 80% passing mark!</p>
+          
+          <div class="stats-overview">
+            <div class="stat-card">
+              <div class="stat-val">330</div>
+              <div class="stat-lbl">Total Questions</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val">10</div>
+              <div class="stat-lbl">Core Units</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val">80%</div>
+              <div class="stat-lbl">Passing Score</div>
+            </div>
+          </div>
+
+          <div class="start-actions">
+            <button id="start-quiz-btn" class="btn btn-primary btn-lg">Start Complete Quiz</button>
+            <button id="custom-quiz-btn" class="btn btn-secondary btn-lg">Configure Custom Practice</button>
+          </div>
+        </div>
+
+        <div class="syllabus-grid">
+          <h3>Quiz Core Syllabus</h3>
+          <div class="units-container" id="units-list">
+            <!-- Programmatically populated list of 10 topics -->
+          </div>
+        </div>
+      </section>
+
+      <!-- Custom Practice Config Screen -->
+      <section id="screen-config" class="screen">
+        <div class="card config-card">
+          <h2>Configure Practice Session</h2>
+          <p>Customize your practice session by filtering by topic, question type, and difficulty.</p>
+          
+          <form id="config-form" class="config-form">
+            <div class="form-group">
+              <label>Select Question Sections</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="type" value="mcq" checked>
+                  Multiple Choice (MCQ)
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="type" value="tf" checked>
+                  True / False
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="type" value="scenario" checked>
+                  Scenario-Based
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="type" value="short" checked>
+                  Short Answer
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Select Difficulty Levels</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" name="difficulty" value="Easy" checked>
+                  Easy (30%)
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="difficulty" value="Medium" checked>
+                  Medium (50%)
+                </label>
+                <label class="checkbox-label">
+                  <input type="checkbox" name="difficulty" value="Hard" checked>
+                  Hard (20%)
+                </label>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="config-topic">Select Specific Unit (Optional)</label>
+              <select id="config-topic" name="topic">
+                <option value="all">All Units</option>
+                <!-- Populated programmatically -->
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="config-limit">Number of Questions</label>
+              <select id="config-limit" name="limit">
+                <option value="10">10 Questions</option>
+                <option value="25" selected>25 Questions</option>
+                <option value="50">50 Questions</option>
+                <option value="100">100 Questions</option>
+                <option value="all">All Available Questions</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button type="button" id="config-back-btn" class="btn btn-secondary">Back to Dashboard</button>
+              <button type="submit" class="btn btn-primary">Start Custom Quiz</button>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Active Quiz Screen -->
+      <section id="screen-quiz" class="screen">
+        <div class="quiz-layout">
+          <!-- Quiz Sidebar -->
+          <div class="quiz-sidebar card">
+            <div class="quiz-progress-summary">
+              <h3>Progress</h3>
+              <div class="progress-bar-container">
+                <div class="progress-bar-fill" id="quiz-progress-fill" style="width: 0%"></div>
+              </div>
+              <div class="progress-text" id="quiz-progress-text">Question 1 of 25</div>
+            </div>
+            
+            <div class="question-nav" id="question-nav-grid">
+              <!-- Navigation grid populated by JS -->
+            </div>
+
+            <div class="sidebar-actions">
+              <button id="submit-quiz-btn" class="btn btn-danger btn-block">Submit Quiz</button>
+            </div>
+          </div>
+
+          <!-- Question Display Area -->
+          <div class="quiz-content">
+            <div class="card question-card" id="active-question-card">
+              <!-- Programmatically populated question content -->
+            </div>
+            
+            <div class="quiz-nav-buttons">
+              <button id="prev-question-btn" class="btn btn-secondary">Previous</button>
+              <button id="next-question-btn" class="btn btn-primary">Next</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Screen -->
+      <section id="screen-results" class="screen">
+        <div class="results-container">
+          <div class="card result-hero-card">
+            <h2 id="result-status-title">Quiz Completed!</h2>
+            <div class="result-score-ring">
+              <svg viewBox="0 0 100 100" class="score-ring">
+                <circle cx="50" cy="50" r="45" class="ring-bg"></circle>
+                <circle cx="50" cy="50" r="45" class="ring-fill" id="score-ring-fill" stroke-dasharray="282.7" stroke-dashoffset="282.7"></circle>
+              </svg>
+              <div class="score-ring-text">
+                <span class="score-percent" id="result-score-percent">0%</span>
+                <span class="score-fraction" id="result-score-fraction">0/0 Points</span>
+              </div>
+            </div>
+            <p id="result-message" class="result-message"></p>
+            <div class="result-badge" id="result-badge-passing">PASSED (&ge; 80%)</div>
+            <div class="result-badge" id="result-badge-failed">FAILED (&lt; 80%)</div>
+
+            <div class="results-actions">
+              <button id="restart-quiz-btn" class="btn btn-primary">Try Again</button>
+              <button id="dashboard-btn" class="btn btn-secondary">Go to Dashboard</button>
+            </div>
+          </div>
+
+          <div class="result-analytics-grid">
+            <!-- Score Breakdown -->
+            <div class="card result-card">
+              <h3>Section Score Breakdown</h3>
+              <div class="breakdown-list" id="score-breakdown-list">
+                <!-- Programmatically populated -->
+              </div>
+            </div>
+
+            <!-- Knowledge Gap Analysis -->
+            <div class="card result-card">
+              <h3>Knowledge Gap Analysis</h3>
+              <div id="gap-analysis-content">
+                <!-- Programmatically populated based on wrong answers -->
+              </div>
+            </div>
+          </div>
+
+          <!-- Wrong Answers Review Section -->
+          <div class="card review-card">
+            <h3>Review Questions & Explanations</h3>
+            <div class="review-list" id="review-questions-list">
+              <!-- Populated with wrong answers and their explanations -->
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="app-footer">
+      <div class="footer-container">
+        <p>&copy; 2026 Arduino Learn Platform. Created for classroom learning and self-evaluation.</p>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
