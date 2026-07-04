@@ -1,250 +1,254 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Arduino Knowledge Assessment Quiz</title>
-  <meta name="description" content="An interactive quiz application to review, reinforce, and evaluate understanding of basic Arduino concepts.">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <title>Arduino Master: Knowledge Assessment Portal</title>
+  <!-- Google Fonts for premium typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- FontAwesome for professional icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="dark-theme">
-  <div id="app">
-    <header class="app-header">
-      <div class="header-container">
-        <div class="logo">
-          <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect width="24" height="24" rx="6" fill="url(#grad)" />
-            <path d="M7 12H17M12 7V17" stroke="white" stroke-width="2.5" stroke-linecap="round" />
-            <defs>
-              <linearGradient id="grad" x1="0" y1="0" x2="24" y2="24" gradientUnits="userSpaceOnUse">
-                <stop stop-color="#00bcd4" />
-                <stop offset="1" stop-color="#009688" />
-              </linearGradient>
-            </defs>
-          </svg>
-          <div class="logo-text">
-            <h1>Arduino Master Quiz</h1>
-            <span>Knowledge Assessment Platform</span>
+<body class="dark-mode"> <!-- Dark mode enabled by default for premium aesthetics -->
+  
+  <!-- Navigation Header -->
+  <header class="app-header">
+    <div class="logo">
+      <i class="fa-solid fa-microchip"></i>
+      <span>Arduino Master <span class="accent-text">Assessment</span></span>
+    </div>
+    <div class="header-actions">
+      <div class="theme-switch" id="theme-toggle">
+        <i class="fa-solid fa-moon"></i>
+      </div>
+      <div class="timer-container hide" id="timer-box">
+        <i class="fa-regular fa-clock"></i>
+        <span id="exam-timer">00:00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="main-container">
+
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard-view" class="view-section">
+      <div class="hero-card">
+        <h1>ระบบประเมินความรู้ Arduino Master Course</h1>
+        <p>หลักสูตรการเขียนโปรแกรมและการใช้งานเซนเซอร์ Arduino เบื้องต้น (10 บทเรียน)</p>
+        <div class="hero-stats">
+          <div class="stat-badge">
+            <i class="fa-solid fa-file-circle-question"></i>
+            <span>330 คำถาม</span>
           </div>
-        </div>
-        <div class="theme-toggle">
-          <button id="toggle-theme-btn" aria-label="Toggle Theme">
-            <svg class="theme-icon-dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            <svg class="theme-icon-light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-          </button>
+          <div class="stat-badge">
+            <i class="fa-solid fa-award"></i>
+            <span>เกณฑ์ผ่าน 80% (264/330)</span>
+          </div>
         </div>
       </div>
-    </header>
 
-    <main class="app-main">
-      <!-- Welcome/Dashboard screen -->
-      <section id="screen-dashboard" class="screen active">
-        <div class="dashboard-hero">
-          <h2>Test Your Arduino Capabilities</h2>
-          <p>Evaluate your skills across 330 questions on Arduino UNO hardware, programming syntax, sensors, I2C, RTC, and SD card data logging. Aim for the 80% passing mark!</p>
-          
-          <div class="stats-overview">
-            <div class="stat-card">
-              <div class="stat-val">330</div>
-              <div class="stat-lbl">Total Questions</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-val">10</div>
-              <div class="stat-lbl">Core Units</div>
-            </div>
-            <div class="stat-card">
-              <div class="stat-val">80%</div>
-              <div class="stat-lbl">Passing Score</div>
-            </div>
-          </div>
-
-          <div class="start-actions">
-            <button id="start-quiz-btn" class="btn btn-primary btn-lg">Start Complete Quiz</button>
-            <button id="custom-quiz-btn" class="btn btn-secondary btn-lg">Configure Custom Practice</button>
-          </div>
+      <div class="syllabus-grid">
+        <div class="syllabus-card">
+          <h3><i class="fa-solid fa-book-open"></i> ขอบเขตบทเรียนที่ประเมิน (10 บทเรียน)</h3>
+          <ul class="syllabus-list">
+            <li><strong>Unit 1:</strong> Introduction to Arduino Hardware & Boards</li>
+            <li><strong>Unit 2:</strong> Arduino C Programming Basics</li>
+            <li><strong>Unit 3:</strong> Basic I/O Components (Relay, Button, Buzzer)</li>
+            <li><strong>Unit 4:</strong> Character LCD 1602 & I2C Interface</li>
+            <li><strong>Unit 5:</strong> LDR Analog Light Sensors & ADC Divider</li>
+            <li><strong>Unit 6:</strong> PIR Motion Sensors & Motion Detection</li>
+            <li><strong>Unit 7:</strong> DHT11 Temperature & Humidity Sensor</li>
+            <li><strong>Unit 8:</strong> LM35 & HIH4030 Analog Temperature/Humidity</li>
+            <li><strong>Unit 9:</strong> DS1302 Real-Time Clock & Timekeeping</li>
+            <li><strong>Unit 10:</strong> SD Cards Reader & Tabular Data Logging</li>
+          </ul>
         </div>
 
-        <div class="syllabus-grid">
-          <h3>Quiz Core Syllabus</h3>
-          <div class="units-container" id="units-list">
-            <!-- Programmatically populated list of 10 topics -->
+        <div class="exam-options-card">
+          <h3><i class="fa-solid fa-gamepad"></i> เลือกโหมดการทดสอบ</h3>
+          <div class="options-grid">
+            <button class="btn btn-primary btn-large" onclick="app.startExam('full')">
+              <i class="fa-solid fa-play"></i>
+              <div>
+                <strong>ทดสอบจำลองสอบจริง (Full Exam)</strong>
+                <span>330 ข้อ | ครอบคลุมทุกบทเรียน | มีการจับเวลา</span>
+              </div>
+            </button>
+            <button class="btn btn-secondary btn-large" onclick="app.startExam('practice')">
+              <i class="fa-solid fa-circle-nodes"></i>
+              <div>
+                <strong>ฝึกฝนอิสระ (Practice Mode)</strong>
+                <span>ฝึกทบทวน | ไม่จำกัดเวลา | เฉลยคำตอบทันที</span>
+              </div>
+            </button>
+            <button class="btn btn-accent btn-large" onclick="app.startExam('quick')">
+              <i class="fa-solid fa-bolt"></i>
+              <div>
+                <strong>การทดสอบด่วน (Quick 10)</strong>
+                <span>สุ่มสั้นๆ 10 ข้อ | สำหรับเช็คความรู้ไว</span>
+              </div>
+            </button>
           </div>
         </div>
-      </section>
-
-      <!-- Custom Practice Config Screen -->
-      <section id="screen-config" class="screen">
-        <div class="card config-card">
-          <h2>Configure Practice Session</h2>
-          <p>Customize your practice session by filtering by topic, question type, and difficulty.</p>
-          
-          <form id="config-form" class="config-form">
-            <div class="form-group">
-              <label>Select Question Sections</label>
-              <div class="checkbox-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" name="type" value="mcq" checked>
-                  Multiple Choice (MCQ)
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="type" value="tf" checked>
-                  True / False
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="type" value="scenario" checked>
-                  Scenario-Based
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="type" value="short" checked>
-                  Short Answer
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label>Select Difficulty Levels</label>
-              <div class="checkbox-group">
-                <label class="checkbox-label">
-                  <input type="checkbox" name="difficulty" value="Easy" checked>
-                  Easy (30%)
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="difficulty" value="Medium" checked>
-                  Medium (50%)
-                </label>
-                <label class="checkbox-label">
-                  <input type="checkbox" name="difficulty" value="Hard" checked>
-                  Hard (20%)
-                </label>
-              </div>
-            </div>
-
-            <div class="form-group">
-              <label for="config-topic">Select Specific Unit (Optional)</label>
-              <select id="config-topic" name="topic">
-                <option value="all">All Units</option>
-                <!-- Populated programmatically -->
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="config-limit">Number of Questions</label>
-              <select id="config-limit" name="limit">
-                <option value="10">10 Questions</option>
-                <option value="25" selected>25 Questions</option>
-                <option value="50">50 Questions</option>
-                <option value="100">100 Questions</option>
-                <option value="all">All Available Questions</option>
-              </select>
-            </div>
-
-            <div class="form-actions">
-              <button type="button" id="config-back-btn" class="btn btn-secondary">Back to Dashboard</button>
-              <button type="submit" class="btn btn-primary">Start Custom Quiz</button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <!-- Active Quiz Screen -->
-      <section id="screen-quiz" class="screen">
-        <div class="quiz-layout">
-          <!-- Quiz Sidebar -->
-          <div class="quiz-sidebar card">
-            <div class="quiz-progress-summary">
-              <h3>Progress</h3>
-              <div class="progress-bar-container">
-                <div class="progress-bar-fill" id="quiz-progress-fill" style="width: 0%"></div>
-              </div>
-              <div class="progress-text" id="quiz-progress-text">Question 1 of 25</div>
-            </div>
-            
-            <div class="question-nav" id="question-nav-grid">
-              <!-- Navigation grid populated by JS -->
-            </div>
-
-            <div class="sidebar-actions">
-              <button id="submit-quiz-btn" class="btn btn-danger btn-block">Submit Quiz</button>
-            </div>
-          </div>
-
-          <!-- Question Display Area -->
-          <div class="quiz-content">
-            <div class="card question-card" id="active-question-card">
-              <!-- Programmatically populated question content -->
-            </div>
-            
-            <div class="quiz-nav-buttons">
-              <button id="prev-question-btn" class="btn btn-secondary">Previous</button>
-              <button id="next-question-btn" class="btn btn-primary">Next</button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Results Screen -->
-      <section id="screen-results" class="screen">
-        <div class="results-container">
-          <div class="card result-hero-card">
-            <h2 id="result-status-title">Quiz Completed!</h2>
-            <div class="result-score-ring">
-              <svg viewBox="0 0 100 100" class="score-ring">
-                <circle cx="50" cy="50" r="45" class="ring-bg"></circle>
-                <circle cx="50" cy="50" r="45" class="ring-fill" id="score-ring-fill" stroke-dasharray="282.7" stroke-dashoffset="282.7"></circle>
-              </svg>
-              <div class="score-ring-text">
-                <span class="score-percent" id="result-score-percent">0%</span>
-                <span class="score-fraction" id="result-score-fraction">0/0 Points</span>
-              </div>
-            </div>
-            <p id="result-message" class="result-message"></p>
-            <div class="result-badge" id="result-badge-passing">PASSED (&ge; 80%)</div>
-            <div class="result-badge" id="result-badge-failed">FAILED (&lt; 80%)</div>
-
-            <div class="results-actions">
-              <button id="restart-quiz-btn" class="btn btn-primary">Try Again</button>
-              <button id="dashboard-btn" class="btn btn-secondary">Go to Dashboard</button>
-            </div>
-          </div>
-
-          <div class="result-analytics-grid">
-            <!-- Score Breakdown -->
-            <div class="card result-card">
-              <h3>Section Score Breakdown</h3>
-              <div class="breakdown-list" id="score-breakdown-list">
-                <!-- Programmatically populated -->
-              </div>
-            </div>
-
-            <!-- Knowledge Gap Analysis -->
-            <div class="card result-card">
-              <h3>Knowledge Gap Analysis</h3>
-              <div id="gap-analysis-content">
-                <!-- Programmatically populated based on wrong answers -->
-              </div>
-            </div>
-          </div>
-
-          <!-- Wrong Answers Review Section -->
-          <div class="card review-card">
-            <h3>Review Questions & Explanations</h3>
-            <div class="review-list" id="review-questions-list">
-              <!-- Populated with wrong answers and their explanations -->
-            </div>
-          </div>
-        </div>
-      </section>
-    </main>
-
-    <footer class="app-footer">
-      <div class="footer-container">
-        <p>&copy; 2026 Arduino Learn Platform. Created for classroom learning and self-evaluation.</p>
       </div>
-    </footer>
-  </div>
-  <script type="module" src="/src/main.js"></script>
+    </section>
+
+    <!-- EXAM PORTAL VIEW -->
+    <section id="exam-view" class="view-section hide">
+      <div class="exam-layout">
+        
+        <!-- Left Pane: Questions -->
+        <div class="question-pane">
+          <div class="pane-header">
+            <div class="question-meta">
+              <span class="topic-tag" id="q-topic">Topic Name</span>
+              <span class="diff-tag" id="q-diff">Difficulty</span>
+            </div>
+            <button class="btn-icon" id="bookmark-btn" title="ปักหมุดข้อนี้">
+              <i class="fa-regular fa-bookmark"></i>
+            </button>
+          </div>
+
+          <div class="objective-info" id="q-objective">
+            Learning Objective Details
+          </div>
+
+          <!-- Question Content -->
+          <div class="question-container">
+            <h2 id="question-text">คำถามจะแสดงที่นี่...</h2>
+            
+            <div class="scenario-box hide" id="scenario-box">
+              <strong>สถานการณ์:</strong>
+              <p id="scenario-text"></p>
+            </div>
+
+            <!-- Options (MCQ & Scenario) -->
+            <div class="options-container" id="options-block">
+              <!-- Dynamically generated options -->
+            </div>
+
+            <!-- Short Answer Input -->
+            <div class="short-answer-container hide" id="short-answer-block">
+              <textarea id="short-answer-input" placeholder="พิมพ์คำตอบสั้นๆ อธิบายความเข้าใจของคุณที่นี่..."></textarea>
+              <div class="short-answer-hint"><i class="fa-solid fa-info-circle"></i> ข้อนี้เป็นข้อเขียนอัตนัย เพื่อใช้วัดความเข้าใจเชิงลึกและทบทวนตัวเองหลังส่งข้อสอบ</div>
+            </div>
+          </div>
+
+          <!-- Bottom Navigation -->
+          <div class="pane-footer">
+            <button class="btn btn-outline" id="prev-btn"><i class="fa-solid fa-arrow-left"></i> ข้อก่อนหน้า</button>
+            <span class="progress-text" id="question-progress">ข้อที่ 1 จาก 330</span>
+            <button class="btn btn-outline" id="next-btn">ข้อถัดไป <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+        </div>
+
+        <!-- Right Pane: Navigation Sidebar -->
+        <div class="sidebar-pane">
+          <div class="sidebar-header">
+            <h3>โครงสร้างข้อสอบ</h3>
+            <button class="btn btn-danger btn-sm" id="submit-exam-btn">ส่งข้อสอบ <i class="fa-solid fa-paper-plane"></i></button>
+          </div>
+
+          <div class="nav-legend">
+            <span class="legend-item"><span class="dot unvisited"></span>ทั่วไป</span>
+            <span class="legend-item"><span class="dot answered"></span>ทำแล้ว</span>
+            <span class="legend-item"><span class="dot flagged"></span>ปักหมุด</span>
+          </div>
+
+          <div class="question-navigation-grid" id="question-nav-grid">
+            <!-- Grid of 330 numbers generated dynamically -->
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- RESULTS VIEW -->
+    <section id="results-view" class="view-section hide">
+      <div class="results-container">
+        
+        <div class="results-header-card">
+          <div class="score-circle-container">
+            <svg class="progress-ring" width="160" height="160">
+              <circle class="progress-ring__circle-bg" stroke="rgba(255,255,255,0.07)" stroke-width="12" fill="transparent" r="70" cx="80" cy="80"/>
+              <circle class="progress-ring__circle" id="score-ring" stroke="var(--primary-color)" stroke-width="12" stroke-dasharray="439.82" stroke-dashoffset="439.82" fill="transparent" r="70" cx="80" cy="80"/>
+            </svg>
+            <div class="score-text">
+              <span id="score-num">0</span>
+              <span class="score-total">/ <span id="score-max">330</span></span>
+            </div>
+          </div>
+
+          <div class="results-summary-text">
+            <h1 id="result-status-title">กำลังคำนวณผล...</h1>
+            <p id="result-status-desc">คำแนะนำตามคะแนนที่ได้รับ</p>
+            <div class="summary-meta-grid">
+              <div class="meta-item">
+                <span class="meta-label">คิดเป็นร้อยละ</span>
+                <span class="meta-val" id="score-percentage">0%</span>
+              </div>
+              <div class="meta-item">
+                <span class="meta-label">ใช้เวลาทำข้อสอบ</span>
+                <span class="meta-val" id="time-spent">00:00</span>
+              </div>
+            </div>
+            <div class="results-action-row">
+              <button class="btn btn-primary" onclick="app.toggleReviewMode()">
+                <i class="fa-solid fa-list-check"></i> ตรวจดูเฉลยคำตอบพร้อมคำอธิบาย
+              </button>
+              <button class="btn btn-secondary" onclick="app.restartApp()">
+                <i class="fa-solid fa-rotate-left"></i> กลับสู่หน้าหลัก
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="results-body-grid">
+          
+          <!-- Proficiency Breakdown by Topic -->
+          <div class="analytics-card">
+            <h3><i class="fa-solid fa-chart-column"></i> วิเคราะห์ระดับความเข้าใจแยกตามหัวข้อ</h3>
+            <div class="topic-bars-container" id="topic-breakdown-list">
+              <!-- Dynamically populated topic proficiency bars -->
+            </div>
+          </div>
+
+          <!-- Knowledge Gap Analysis & Recommendations -->
+          <div class="gap-analysis-card">
+            <h3><i class="fa-solid fa-triangle-exclamation"></i> รายงานวิเคราะห์ช่องว่างความรู้ (Knowledge Gap Analysis)</h3>
+            <div class="gap-content">
+              <p>ระบบได้วิเคราะห์คำตอบและตรวจจับจุดที่คุณมักสับสนบ่อย:</p>
+              <ul class="gap-list" id="gap-analysis-list">
+                <!-- Dynamically generated gap analysis bullets -->
+              </ul>
+              
+              <div class="revision-box">
+                <h4><i class="fa-solid fa-book-bookmark"></i> บทเรียนที่ควรทบทวนเร่งด่วน (Top 5 Revision Units)</h4>
+                <ol id="revision-topics-list">
+                  <!-- Dynamically populated list -->
+                </ol>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- REVIEW MODE CONTROLLER (Sticky bar when reviewing) -->
+    <div class="review-mode-bar hide" id="review-bar">
+      <span><i class="fa-solid fa-magnifying-glass"></i> อยู่ในโหมดเฉลยข้อสอบอย่างละเอียด</span>
+      <button class="btn btn-accent btn-sm" onclick="app.exitReviewMode()"><i class="fa-solid fa-circle-xmark"></i> ปิดโหมดเฉลย</button>
+    </div>
+
+  </main>
+
+  <!-- JS Code File -->
+  <script src="app.js"></script>
 </body>
 </html>
